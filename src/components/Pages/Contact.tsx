@@ -16,7 +16,7 @@ const Contact: FC = () => {
 
   return (
     <section
-      className="max-w-[1200px] mx-auto bg-[#e6f2e6] rounded-4xl sm:py-20 py-12 px-6 shadow-2xl"
+      className="max-w-[1200px] mx-auto bg-[#e6f2e6] rounded-4xl sm:py-20 py-12 px-6 "
       id="contact"
       data-aos="fade-up"
       data-aos-duration="1600"
