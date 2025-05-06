@@ -1,5 +1,6 @@
 import React from 'react';
 import { Facebook, Linkedin, Instagram, Youtube } from 'lucide-react';
+import Link from 'next/link';
 
 const Footer = () => {
   return (
@@ -17,10 +18,10 @@ const Footer = () => {
         <div>
           <h4 className="text-white text-lg font-semibold mb-4">Quick Links</h4>
           <ul className="space-y-2 text-sm">
-            <li><a href="/" className="hover:text-white">Home</a></li>
-            <li><a href="/about" className="hover:text-white">About</a></li>
-            <li><a href="/videos" className="hover:text-white">Videos</a></li>
-            <li><a href="/contact" className="hover:text-white">Contact</a></li>
+            <li><Link href="/" className="hover:text-white">Home</Link></li>
+            <li><Link href="/about" className="hover:text-white">About</Link></li>
+            <li><Link href="/videos" className="hover:text-white">Videos</Link></li>
+            <li><Link href="/contact" className="hover:text-white">Contact</Link></li>
           </ul>
         </div>
 

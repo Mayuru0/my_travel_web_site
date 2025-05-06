@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, type FC } from "react"
-import { Phone, Mail, MapPin, ChevronDown } from "lucide-react"
+import { Phone, Mail, MapPin } from "lucide-react"
 import AOS from "aos"
 import "aos/dist/aos.css"
 

@@ -17,7 +17,7 @@ const Hero = () => {
           Welcome to My Travel Blog
         </h1>
         <p className="text-lg sm:text-2xl text-white max-w-2xl">
-         "Travel is life, one adventure at a time. It’s not just where we go, but who we share the journey with. Let’s wander together!"  
+        &quot;Travel is life, one adventure at a time.&quot; It’s not just where we go, but who we share the journey with. Let’s wander together! 
         </p>
         <button className="mt-6 px-6 py-3 bg-white text-black rounded-lg text-lg hover:bg-gray-200 transition">
           Watch My Videos

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
-import { motion } from "framer-motion";
+
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 

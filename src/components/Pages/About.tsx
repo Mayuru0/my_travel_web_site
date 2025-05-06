@@ -1,3 +1,4 @@
+import Image from "next/image";
 import React from "react";
 import { FaYoutube, FaInstagram, FaTwitter, FaFacebook, FaTiktok,FaLinkedin } from "react-icons/fa";
 
@@ -41,7 +42,9 @@ const About = () => {
       {/* About Me Section */}
       <section className="max-w-6xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-8 items-center">
         <div className="ml-10">
-          <img
+          <Image
+            width={200}
+            height={200}
             src="/hero/abc.JPG"
             alt="Mayuru Madhuranga"
             className="rounded-full border border-green-500 w-48 h-48 object-cover mx-auto md:mx-0"
@@ -64,7 +67,7 @@ const About = () => {
         <div className="md:-ml-52">
           <h2 className="text-3xl font-semibold mb-4">About Me</h2>
           <p className="text-gray-700 mb-4">
-            Hello, I'm Mayuru — a nature lover, hiker, and traveler. I adore sharing real stories and moments from my travels, and I have a strong enthusiasm for discovering new cultures and landscapes. Join me on this journey to discover the beauty of the world!
+          Hello, I&apos;m Mayuru — a nature lover, hiker, and traveler. I adore sharing real stories and moments from my travels, and I have a strong enthusiasm for discovering new cultures and landscapes. Join me on this journey to discover the beauty of the world!
           </p>
         </div>
       </section>
