@@ -44,7 +44,7 @@ export default function FeaturedVideos() {
           {videos.map((video) => (
             <div key={video.id} className="flex flex-col items-center">
               <div
-                className="relative w-full aspect-video rounded-md overflow-hidden cursor-pointer"
+                className="relative w-full aspect-video rounded-md overflow-hidden cursor-pointer scale-100 hover:scale-105 transition-transform duration-300 ease-in-out"
                 onClick={() => handlePlayVideo(video.url)}
               >
                 <Image
@@ -69,7 +69,7 @@ export default function FeaturedVideos() {
         {/* See More Button */}
         <div className="flex justify-center mt-6">
           <Link
-            href="/mavoga"
+            href="/vlog"
             className="bg-[#4a3f35] text-white px-6 py-2 rounded-md hover:bg-[#3b322b] transition"
           >
             See More Videos
