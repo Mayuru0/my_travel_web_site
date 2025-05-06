@@ -35,7 +35,7 @@ const Vlogs = () => {
     <div className='h-screen  '>
       <div className=' relative text-4xl font-bold text-center  bg-[#E8E8E8] min-h-80'>
      
-        <Image src="/hero/new.png" alt="cover" fill
+        <Image src="/hero/new11.png" alt="cover" fill
         style={{ objectFit: "cover" }}
         priority
         />
