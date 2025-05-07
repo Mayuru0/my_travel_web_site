@@ -60,7 +60,7 @@ const Contact: FC = () => {
 
         {/* Contact Form Section */}
         <form
-          action="https://getform.io/f/ayvkqmeb"
+          action="https://getform.io/f/bwnqlyja"
           method="POST"
           className="bg-[#d0e4d0] rounded-2xl p-8 space-y-5 shadow-lg"
         >
@@ -69,14 +69,14 @@ const Contact: FC = () => {
               type="text"
               name="firstname"
               placeholder="Firstname"
-              className="w-full px-4 py-3 bg-[#d0e4d0] text-gray-300 placeholder-gray-500 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+              className="w-full px-4 py-3 bg-[#d0e4d0] text-black placeholder-gray-500 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
               required
             />
             <input
               type="text"
               name="lastname"
               placeholder="Lastname"
-              className="w-full px-4 py-3 bg-[#d0e4d0] text-gray-300 placeholder-gray-500 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+              className="w-full px-4 py-3 bg-[#d0e4d0] text-black placeholder-gray-500 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
               required
             />
           </div>
@@ -85,7 +85,7 @@ const Contact: FC = () => {
             type="email"
             name="email"
             placeholder="Email address"
-            className="w-full px-4 py-3 bg-[#d0e4d0] text-gray-300 placeholder-gray-500 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+            className="w-full px-4 py-3 bg-[#d0e4d0] text-black placeholder-gray-500 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
             required
           />
 
@@ -93,7 +93,7 @@ const Contact: FC = () => {
             type="tel"
             name="phone"
             placeholder="Phone number"
-            className="w-full px-4 py-3 bg-[#d0e4d0] text-gray-300 placeholder-gray-500 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+            className="w-full px-4 py-3 bg-[#d0e4d0] text-black placeholder-gray-500 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
           />
 
           
@@ -101,7 +101,7 @@ const Contact: FC = () => {
             name="message"
             placeholder="Type your message here."
             rows={5}
-            className="w-full px-4 py-3 bg-[#d0e4d0] text-gray-300 placeholder-gray-500 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+            className="w-full px-4 py-3 bg-[#d0e4d0] text-black placeholder-gray-500 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
             required
           />
 

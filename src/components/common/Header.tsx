@@ -2,11 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
-
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-
-
 
 interface NavLink {
   href: string;
@@ -18,8 +15,8 @@ const Header = () => {
   const [isMounted, setIsMounted] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const router = useRouter();
-  
   const [isClient, setIsClient] = useState(false);
+
   const navigationLinks: NavLink[] = [
     { href: "home", label: "Home" },
     { href: "about", label: "About" },
@@ -30,6 +27,7 @@ const Header = () => {
 
   useEffect(() => {
     setIsMounted(true);
+    setIsClient(true);
 
     const handleScroll = () => {
       const sections = document.querySelectorAll("section");
@@ -63,19 +61,10 @@ const Header = () => {
     }
   };
 
-  
-  useEffect(() => {
-    setIsClient(true); // Set to true when client-side render is complete
-  }, []);
-
-  
-  if (!isClient) {
-    return null; // Return nothing before the client-side rendering
+  if (!isClient || !isMounted) {
+    return null;
   }
 
- 
-
-  if (!isMounted) return null;
   return (
     <header className="w-full fixed top-0 left-0 right-0 bg-transparent backdrop-blur-sm z-50 border-b border-white/10">
       <div className="mx-auto w-full">
@@ -89,7 +78,6 @@ const Header = () => {
                 height={50}
                 className="cursor-pointer"
               />
-              
             </div>
           </h1>
 
@@ -99,10 +87,10 @@ const Header = () => {
                 <button
                   key={link.href}
                   onClick={() => handleNavClick(link.href)}
-                  className={`transition-all duration-300 text-base font-medium ${
+                  className={`transition-all duration-300 text-base font-medium cursor-pointer ${
                     activeSection === link.href
                       ? "text-green-600 underline"
-                      : "text-white hover:text-[#03DAC6] hover:underline"
+                      : "text-white hover:text-[#03DAC6] hover:underline cursor-pointer"
                   }`}
                 >
                   {link.label}
@@ -111,14 +99,34 @@ const Header = () => {
             </nav>
           </div>
 
-         
-
-          <button onClick={() => setIsOpen(!isOpen)} className="lg:hidden text-white focus:outline-none">
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="lg:hidden text-white focus:outline-none"
+          >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
 
-       
+        {/* MOBILE NAVIGATION */}
+        {isOpen && (
+          <div className="lg:hidden bg-black bg-opacity-90">
+            <nav className="flex flex-col space-y-4 px-4 py-4">
+              {navigationLinks.map((link) => (
+                <button
+                  key={link.href}
+                  onClick={() => handleNavClick(link.href)}
+                  className={`transition-all duration-300 text-base font-medium text-left ${
+                    activeSection === link.href
+                      ? "text-green-600 underline"
+                      : "text-white hover:text-[#03DAC6] hover:underline "
+                  }`}
+                >
+                  {link.label}
+                </button>
+              ))}
+            </nav>
+          </div>
+        )}
       </div>
     </header>
   );
