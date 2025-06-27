@@ -7,7 +7,7 @@ import Galle from "../../public/Destinations/Galle.png";
 import Kandy from "../../public/Destinations/Kandy.png";
 import Polonnaruwa from "../../public/Destinations/Polonnaruwa.png";
 import Pinnawala from "../../public/Destinations/Pinnawala.png";
-import { StaticImageData } from "next/image";
+//import { StaticImageData } from "next/image";
 
 import { Destination, MoreDestination } from "@/type";
 

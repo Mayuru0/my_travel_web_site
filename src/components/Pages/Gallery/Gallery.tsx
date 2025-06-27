@@ -13,7 +13,7 @@ type GalleryProps = {
   description: string
 };
 
-const Gallery: React.FC<GalleryProps> = ({ id, name, image, gallery,description }) => {
+const Gallery: React.FC<GalleryProps> = ({ id, name, gallery,description }) => {
   const [selectedDestinationId, setSelectedDestinationId] = useState<string>('');
 
   // Filter out the current destination from the list
