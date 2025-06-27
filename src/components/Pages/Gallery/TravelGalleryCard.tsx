@@ -2,14 +2,14 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
-import { MoreDestination } from "../../../data/destinations";
+import { moreDestinations } from "@/data/destinations";
 import plusIcon from "../../../../public/octicon_feed-plus-16.svg";
+import Link from "next/link";
+import {MoreDestination } from"@/type/index"
 
-type DestinationCardProps = {
-  moreDestinations: MoreDestination;
-};
+const TravelGalleryCard: React.FC<{ moreDestinations: MoreDestination }> = ({ moreDestinations }) => (
 
-const TravelGalleryCard: React.FC<DestinationCardProps> = ({ moreDestinations }) => (
+  
   <div className="flex items-center justify-center w-full">
     <div className="w-full">
       <div className="group relative cursor-pointer items-center justify-center overflow-hidden transition-shadow hover:shadow-xl rounded-lg">
@@ -26,7 +26,10 @@ const TravelGalleryCard: React.FC<DestinationCardProps> = ({ moreDestinations })
         <div className="absolute inset-0 rounded-xl flex bg-black-50 translate-y-[59%] flex-col items-center justify-center px-4 sm:px-6 md:px-9 text-center transition-all duration-500 group-hover:translate-y-0">
           <h1 className="text-xl sm:text-2xl font-bold text-white mt-[-35%]">{moreDestinations.name}</h1>
           <div className="mt-[10%]">
-            <Image src={plusIcon || "/placeholder.svg"} alt="plusIcon" />
+          <Link href={`/gallery/${moreDestinations.id}`}>
+
+       <Image src={plusIcon || "/placeholder.svg"} alt="plusIcon" className="cursor-pointer" />
+        </Link>
           </div>
         </div>
       </div>
@@ -107,7 +110,7 @@ const TravelGalleryCarousel: React.FC<DestinationCarouselProps> = ({
         <button
           onClick={nextSlide}
           disabled={startIndex >= maxStartIndex}
-          className={`absolute right-0 top-1/2 transform -translate-y-1/2 bg-white p-2 sm:p-3 rounded-full shadow-md z-10 ${
+          className={`absolute right-0  top-1/2 transform -translate-y-1/2 bg-white p-2 sm:p-3 rounded-full shadow-md z-10 ${
             startIndex >= maxStartIndex ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'
           }`}
           aria-label="Next slide"

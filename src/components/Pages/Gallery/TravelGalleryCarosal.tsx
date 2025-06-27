@@ -1,5 +1,5 @@
-import TravelGalleryCard from "../Gallery/TravelGalleryCard";
-import { moreDestinations } from "../../../data/destinations";
+import TravelGalleryCard from "./TravelGalleryCard";
+import { moreDestinations } from "@/data/destinations";
 
 export default function TravelGalleryCarosal() {
   return (

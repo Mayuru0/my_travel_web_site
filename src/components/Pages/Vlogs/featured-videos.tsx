@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { Play } from "lucide-react";
 import Link from "next/link";
-import {featured} from "../../../data/video";
+import {featured} from "@/data/video";
 export default function FeaturedVideos() {
  
 

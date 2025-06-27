@@ -66,7 +66,7 @@ const Header = () => {
   }
 
   return (
-    <header className="w-full fixed top-0 left-0 right-0 bg-transparent backdrop-blur-sm z-50 border-b border-white/10">
+    <header className="w-full fixed top-0 left-0 right-0 bg-transparent backdrop-blur-sm z-50 border-b border-white/10 ">
       <div className="mx-auto w-full">
         <div className="flex h-16 px-4 lg:px-24 items-center justify-between">
           <h1 className="text-2xl font-semibold text-white font-lexend">
@@ -90,7 +90,7 @@ const Header = () => {
                   className={`transition-all duration-300 text-base font-medium cursor-pointer ${
                     activeSection === link.href
                       ? "text-green-600 underline"
-                      : "text-white hover:text-[#03DAC6] hover:underline cursor-pointer"
+                      : "text-black hover:text-[#03DAC6] hover:underline cursor-pointer"
                   }`}
                 >
                   {link.label}
