@@ -30,7 +30,7 @@ const Vlogs = () => {
     fetchVlogs();
   }, []);
 
-  console.log(vlogs);
+
 
   const handlePlayVideo = (url: string) => {
     window.open(url, "_blank");
