@@ -1,76 +1,114 @@
-"use client"
-import Image from "next/image"
-import React, { useState, useMemo } from "react"
-import { Play, Search, Filter } from "lucide-react"
-import { videos } from "@/data/video"
+"use client";
+import Image from "next/image";
+import React, { useState, useMemo, useEffect } from "react";
+import { Play, Search, Filter } from "lucide-react";
+import { Vlog } from "@/types/index";
+import { getVlogs } from "@/lib/vlog";
 
-type FilterType = "all" | "cinematic" | "vlog"
+type FilterType = "all" | "cinematic" | "vlog";
 
 const Vlogs = () => {
-  const [currentPage, setCurrentPage] = useState(1)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [activeFilter, setActiveFilter] = useState<FilterType>("all")
-  const videosPerPage = 6
+  const [vlogs, setVlogs] = useState<Vlog[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeFilter, setActiveFilter] = useState<FilterType>("all");
+  const videosPerPage = 6;
+
+  useEffect(() => {
+    const fetchVlogs = async () => {
+      try {
+        const data = await getVlogs();
+        setVlogs(data);
+      } catch (error) {
+        console.error("Failed to fetch vlogs:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVlogs();
+  }, []);
+
+  console.log(vlogs);
 
   const handlePlayVideo = (url: string) => {
-    window.open(url, "_blank")
-  }
+    window.open(url, "_blank");
+  };
 
   // Filter and search logic
   const filteredVideos = useMemo(() => {
-    let filtered = videos
+    let filtered = vlogs;
 
-    // Apply category filter
     if (activeFilter !== "all") {
-      filtered = filtered.filter((video) => video.category === activeFilter)
+      filtered = filtered.filter((video) => video.category === activeFilter);
     }
 
-    // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter(
         (video) =>
           video.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          video.description?.toLowerCase().includes(searchTerm.toLowerCase()),
-      )
+          video.description?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
     }
 
-    return filtered
-  }, [searchTerm, activeFilter])
+    return filtered;
+  }, [searchTerm, activeFilter, vlogs]);
 
   // Reset to first page when filters change
   React.useEffect(() => {
-    setCurrentPage(1)
-  }, [searchTerm, activeFilter])
+    setCurrentPage(1);
+  }, [searchTerm, activeFilter]);
 
   // Pagination logic with filtered videos
-  const indexOfLastVideo = currentPage * videosPerPage
-  const indexOfFirstVideo = indexOfLastVideo - videosPerPage
-  const currentVideos = filteredVideos.slice(indexOfFirstVideo, indexOfLastVideo)
-  const totalPages = Math.ceil(filteredVideos.length / videosPerPage)
+  const indexOfLastVideo = currentPage * videosPerPage;
+  const indexOfFirstVideo = indexOfLastVideo - videosPerPage;
+  const currentVideos = filteredVideos.slice(
+    indexOfFirstVideo,
+    indexOfLastVideo
+  );
+  const totalPages = Math.ceil(filteredVideos.length / videosPerPage);
 
   const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1)
-  }
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
 
   const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1)
-  }
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
 
   const handleFilterChange = (filter: FilterType) => {
-    setActiveFilter(filter)
-  }
+    setActiveFilter(filter);
+  };
 
   const clearSearch = () => {
-    setSearchTerm("")
-  }
+    setSearchTerm("");
+  };
+
+  //   // ✅ Show loading while fetching
+  // if (loading) {
+  //   return (
+  //     <div className="flex justify-center items-center h-screen bg-[#e6f2e6]">
+  //       <p className="text-gray-600 text-xl">Loading videos...</p>
+  //     </div>
+  //   )
+  // }
 
   return (
     <div className="bg-[#e6f2e6] ">
       {/* Hero Section */}
       <div className="relative text-4xl font-bold text-center bg-[#E8E8E8] min-h-80">
-        <Image src="/hero/new11.png" alt="cover" fill style={{ objectFit: "cover" }} priority />
+        <Image
+          src="/hero/new11.png"
+          alt="cover"
+          fill
+          style={{ objectFit: "cover" }}
+          priority
+        />
         <div className="absolute inset-0 bg-opacity-50 flex flex-col items-center justify-center text-center -mt-2 px-4">
-          <h1 className="text-4xl sm:text-6xl font-bold text-white mb-4">Videos</h1>
+          <h1 className="text-4xl sm:text-6xl font-bold text-white mb-4">
+            Videos
+          </h1>
         </div>
       </div>
 
@@ -127,18 +165,32 @@ const Vlogs = () => {
           <div className="text-center text-gray-600">
             {searchTerm || activeFilter !== "all" ? (
               <p>
-                Showing {filteredVideos.length} result{filteredVideos.length !== 1 ? "s" : ""}
+                Showing {filteredVideos.length} result
+                {filteredVideos.length !== 1 ? "s" : ""}
                 {searchTerm && ` for "${searchTerm}"`}
-                {activeFilter !== "all" && ` in ${activeFilter === "cinematic" ? "Cinematic" : "Vlogs"}`}
+                {activeFilter !== "all" &&
+                  ` in ${activeFilter === "cinematic" ? "Cinematic" : "Vlogs"}`}
               </p>
             ) : (
-              <p>Showing all {videos.length} videos</p>
+              <p>Showing all {vlogs.length} videos</p>
             )}
           </div>
         </div>
 
         {/* Videos Grid */}
-        {currentVideos.length > 0 ? (
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="space-y-3">
+                <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-gray-300 animate-pulse">
+                  <div className="absolute inset-0 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 bg-[length:200%_100%] animate-[shimmer_1.5s_infinite]" />
+                </div>
+                <div className="h-4 bg-gray-300 rounded w-3/4 animate-pulse" />
+                <div className="h-3 bg-gray-200 rounded w-1/2 animate-pulse" />
+              </div>
+            ))}
+          </div>
+        ) : currentVideos.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             {currentVideos.map((video) => (
               <div key={video.id} className="flex flex-col">
@@ -147,7 +199,10 @@ const Vlogs = () => {
                   onClick={() => handlePlayVideo(video.url)}
                 >
                   <Image
-                    src={video.thumbnail || "/placeholder.svg?height=200&width=350"}
+                    src={
+                      video.thumbnailUrl ||
+                      "/placeholder.svg?height=200&width=350"
+                    }
                     alt={video.title}
                     fill
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -158,11 +213,12 @@ const Vlogs = () => {
                       <Play className="h-8 w-8 text-white" fill="white" />
                     </div>
                   </div>
-                  {/* Category Badge */}
                   <div className="absolute top-3 left-3">
                     <span
                       className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        video.category === "cinematic" ? "bg-purple-600 text-white" : "bg-green-600 text-white"
+                        video.category === "cinematic"
+                          ? "bg-purple-600 text-white"
+                          : "bg-green-600 text-white"
                       }`}
                     >
                       {video.category === "cinematic" ? "Cinematic" : "Vlog"}
@@ -170,9 +226,19 @@ const Vlogs = () => {
                   </div>
                 </div>
                 <div className="mt-3">
-                  <h3 className="text-lg font-semibold text-[#4a3f35] line-clamp-2">{video.title}</h3>
-                  {video.description && <p className="text-sm text-gray-600 mt-1 line-clamp-2">{video.description}</p>}
-                  {video.duration && <p className="text-xs text-gray-500 mt-2">Duration: {video.duration}</p>}
+                  <h3 className="text-lg font-semibold text-[#4a3f35] line-clamp-2">
+                    {video.title}
+                  </h3>
+                  {video.description && (
+                    <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                      {video.description}
+                    </p>
+                  )}
+                  {video.duration && (
+                    <p className="text-xs text-gray-500 mt-2">
+                      Duration: {video.duration}
+                    </p>
+                  )}
                 </div>
               </div>
             ))}
@@ -182,13 +248,17 @@ const Vlogs = () => {
             <div className="text-gray-400 mb-4">
               <Search className="h-16 w-16 mx-auto" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-600 mb-2">No videos found</h3>
-            <p className="text-gray-500 mb-4">Try adjusting your search terms or filters</p>
+            <h3 className="text-xl font-semibold text-gray-600 mb-2">
+              No videos found
+            </h3>
+            <p className="text-gray-500 mb-4">
+              Try adjusting your search terms or filters
+            </p>
             {(searchTerm || activeFilter !== "all") && (
               <button
                 onClick={() => {
-                  setSearchTerm("")
-                  setActiveFilter("all")
+                  setSearchTerm("");
+                  setActiveFilter("all");
                 }}
                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200"
               >
@@ -215,15 +285,15 @@ const Vlogs = () => {
 
             <div className="flex items-center gap-2">
               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                let pageNum
+                let pageNum;
                 if (totalPages <= 5) {
-                  pageNum = i + 1
+                  pageNum = i + 1;
                 } else if (currentPage <= 3) {
-                  pageNum = i + 1
+                  pageNum = i + 1;
                 } else if (currentPage >= totalPages - 2) {
-                  pageNum = totalPages - 4 + i
+                  pageNum = totalPages - 4 + i;
                 } else {
-                  pageNum = currentPage - 2 + i
+                  pageNum = currentPage - 2 + i;
                 }
 
                 return (
@@ -238,7 +308,7 @@ const Vlogs = () => {
                   >
                     {pageNum}
                   </button>
-                )
+                );
               })}
             </div>
 
@@ -257,7 +327,7 @@ const Vlogs = () => {
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Vlogs
+export default Vlogs;

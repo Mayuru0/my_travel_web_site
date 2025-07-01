@@ -5,7 +5,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 //import { moreDestinations } from "@/data/destinations";
 import plusIcon from "../../../../public/octicon_feed-plus-16.svg";
 import Link from "next/link";
-import {MoreDestination } from"@/type/index"
+import {MoreDestination } from"@/types/index"
 
 const TravelGalleryCard: React.FC<{ moreDestinations: MoreDestination }> = ({ moreDestinations }) => (
 

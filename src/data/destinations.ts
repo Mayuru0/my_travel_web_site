@@ -9,7 +9,7 @@ import Polonnaruwa from "../../public/Destinations/Polonnaruwa.png";
 import Pinnawala from "../../public/Destinations/Pinnawala.png";
 //import { StaticImageData } from "next/image";
 
-import { Destination, MoreDestination } from "@/type";
+import { Destination, MoreDestination } from "@/types";
 
 export const destinations: Destination[] = [
   {

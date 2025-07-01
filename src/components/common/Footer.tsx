@@ -43,7 +43,7 @@ const Footer = () => {
               placeholder="Your email"
               className="w-full sm:w-auto flex-grow px-3 py-2 rounded sm:rounded-l bg-white border border-gray-300 focus:outline-none mb-2 sm:mb-0"
             />
-            <button className="px-4 py-2 bg-orange-500 text-white rounded sm:rounded-r hover:bg-orange-600 transition">
+            <button className="px-4 py-2 bg-green-500 rounded-lg hover:bg-green-600 text-white  sm:rounded-r  transition">
               Subscribe
             </button>
           </form>
