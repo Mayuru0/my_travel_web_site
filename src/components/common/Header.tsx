@@ -53,6 +53,12 @@ const Header = () => {
   const handleNavClick = (href: string) => {
     setIsOpen(false);
     setActiveSection(href);
+
+     if (href.startsWith("/")) {
+    router.push(href);
+    return;
+  }
+
     const element = document.getElementById(href);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });

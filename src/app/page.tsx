@@ -1,6 +1,6 @@
 import About from "@/components/Pages/About";
 
-import TravelGalleryCarosal from "@/components/Pages/Gallery/TravelGalleryCarosal";
+import TravelGalleryCarosal from "@/components/Pages/Gallery/TravelGalleryTravelGalleryContainer";
 import Contact from "@/components/Pages/Contact";
 import Hero from "@/components/Pages/Hero";
 import FeaturedVideos from "@/components/Pages/Vlogs/featured-videos";

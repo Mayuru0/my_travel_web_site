@@ -1,19 +1,47 @@
 import { StaticImageData } from "next/image";
 
-export type Destination = {
-  id: number;
-  name: string;
-  province: string;
-  image: StaticImageData; 
-  description: string;
-  gallery: {
-    image1: StaticImageData;
-    image2: StaticImageData;
-  };
-  coverImg: StaticImageData;
+// export type Destination = {
+//   id: number;
+//   name: string;
+//   province: string;
+//  // image: StaticImageData; 
+//   description: string;
+//   gallery: {
+//     image1: StaticImageData;
+//     image2: StaticImageData;
+//     image3: StaticImageData;
+//     image4: StaticImageData;
+//     image5: StaticImageData;
+//     image6: StaticImageData;
+//     image7: StaticImageData;
+//   };
+//   coverImg: StaticImageData;
 
   
+// }
+
+
+export interface Destination  {
+  id?: string;
+  province: string
+  title: string
+  date:string
+  description: string
+  coverImgUrl: string
+  galleryUrls: string[]
+};
+
+
+export interface GalleryData {
+  id: string;
+  title: string;
+  date: string;
+  province: string;
+  description: string;
+  coverImgUrl: string;
+  galleryUrls: string[];
 }
+
   
   export type MoreDestination = {
     id: number;
