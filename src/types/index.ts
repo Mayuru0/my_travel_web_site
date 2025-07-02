@@ -60,4 +60,5 @@ export interface GalleryData {
   thumbnailUrl: string;
   public_id?: string; 
  vlogId?: string
+ featured?: boolean;
 }

@@ -31,7 +31,10 @@ export default function FeaturedVideos() {
     window.open(url, "_blank");
   };
 
-  const lastThreeVlogs = vlogs.slice(0, 3);
+const lastThreeFeaturedVlogs = vlogs
+  .filter((vlog) => vlog.featured)
+  .slice(0, 3);
+
 
   return (
     <div className="w-full py-8 px-4">
@@ -60,7 +63,7 @@ export default function FeaturedVideos() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {lastThreeVlogs.map((video, i) => (
+            {lastThreeFeaturedVlogs.map((video, i) => (
               <motion.div
                 key={video.id}
                 initial={{ opacity: 0, y: 30, scale: 0.95 }}
