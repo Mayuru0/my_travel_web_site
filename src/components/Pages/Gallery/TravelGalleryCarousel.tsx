@@ -98,10 +98,9 @@ const TravelGalleryCarousel: React.FC<TravelGalleryCarouselProps> = ({
         </button>
 
         <button
-          data-aos="fade-left"
-          data-aos-anchor="#example-anchor"
-          data-aos-offset="500"
-          data-aos-duration="500"
+            data-aos="fade-left"
+          data-aos-offset="300"
+          data-aos-easing="ease-in-sine"
           onClick={nextSlide}
           disabled={startIndex >= maxStartIndex}
           className={`absolute right-0 top-1/2 transform -translate-y-1/2 bg-white p-2 sm:p-3 rounded-full shadow-md z-10 ${
