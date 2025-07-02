@@ -117,12 +117,12 @@ const Gallery: React.FC<GalleryProps> = ({ galleryId }) => {
               ? "Please try again later."
               : "The destination you're looking for doesn't exist."}
           </p>
-          <a
+          <Link
             href="/"
             className="inline-block bg-[#004643] text-white px-6 py-3 rounded-lg hover:bg-[#003a37] transition-colors font-medium"
           >
             Go Back Home
-          </a>
+          </Link>
         </div>
       </div>
     );
