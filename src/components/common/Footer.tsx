@@ -50,8 +50,8 @@ const Footer = () => {
         </div>
 
         {/* Social Icons */}
-        <div>
-          <h4 className="text-gray-900 text-lg font-semibold mb-4">Follow Me</h4>
+        <div className='xl:ml-10 lg:ml-20 ml-0'>
+          <h4 className="text-gray-900 text-lg m font-semibold mb-4">Follow Me</h4>
           <div className="flex flex-wrap gap-4">
             {Social.map((item, index) => (
               <a

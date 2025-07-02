@@ -4,6 +4,8 @@ import React, { useState, useMemo, useEffect } from "react";
 import { Play, Search, Filter } from "lucide-react";
 import { Vlog } from "@/types/index";
 import { getVlogs } from "@/lib/vlog";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 type FilterType = "all" | "cinematic" | "vlog";
 
@@ -93,11 +95,22 @@ const Vlogs = () => {
   //     </div>
   //   )
   // }
+useEffect(() => {
+  AOS.init({
+    duration: 800,      // animation duration in ms
+    once: true,         // animate only once when scrolled into view
+    easing: "ease-in-out",
+  });
+}, []);
+
+
 
   return (
     <div className="bg-[#e6f2e6] ">
       {/* Hero Section */}
-      <div className="relative text-4xl font-bold text-center bg-[#E8E8E8] min-h-80">
+      <div className="relative text-4xl font-bold text-center bg-[#E8E8E8] min-h-80 "
+      data-aos="fade-down"
+      >
         <Image
           src="/hero/new11.png"
           alt="cover"
@@ -106,7 +119,7 @@ const Vlogs = () => {
           priority
         />
         <div className="absolute inset-0 bg-opacity-50 flex flex-col items-center justify-center text-center -mt-2 px-4">
-          <h1 className="text-4xl sm:text-6xl font-bold text-white mb-4">
+          <h1 className="text-4xl sm:text-6xl font-bold text-white mb-4 animate-bounce">
             Videos
           </h1>
         </div>
@@ -116,7 +129,9 @@ const Vlogs = () => {
         {/* Search and Filter Section */}
         <div className="mb-8 space-y-4">
           {/* Search Bar */}
-          <div className="relative max-w-md mx-auto">
+          <div className="relative max-w-md mx-auto"
+          data-aos="fade-up" data-aos-delay="100"
+          >
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Search className="h-5 w-5 text-gray-400" />
             </div>
@@ -138,7 +153,9 @@ const Vlogs = () => {
           </div>
 
           {/* Filter Buttons */}
-          <div className="flex justify-center items-center gap-2 flex-wrap">
+          <div className="flex justify-center items-center gap-2 flex-wrap"
+          data-aos="zoom-in" data-aos-delay="200"
+          >
             <Filter className="h-5 w-5 text-gray-600" />
             <div className="flex gap-2">
               {[
@@ -192,8 +209,11 @@ const Vlogs = () => {
           </div>
         ) : currentVideos.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {currentVideos.map((video) => (
-              <div key={video.id} className="flex flex-col">
+            {currentVideos.map((video,index) => (
+              <div key={video.id} className="flex flex-col"
+              data-aos="fade-up"
+            data-aos-delay={index * 100}
+              >
                 <div
                   className="relative w-full aspect-video rounded-lg overflow-hidden cursor-pointer group"
                   onClick={() => handlePlayVideo(video.url)}
