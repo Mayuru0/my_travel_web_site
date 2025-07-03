@@ -9,6 +9,7 @@ import { getGalleryById, getGalleries } from "@/lib/gallery";
 
 import AOS from "aos";
 import "aos/dist/aos.css";
+
 interface GalleryProps {
   galleryId: string;
 }
@@ -23,8 +24,11 @@ const Gallery: React.FC<GalleryProps> = ({ galleryId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
 
+  // Pagination state
+  const imagesPerPage = 8;
+  const [currentPage, setCurrentPage] = useState(1);
 
- useEffect(() => {
+  useEffect(() => {
     AOS.init({ duration: 800, once: true });
   }, []);
 
@@ -68,8 +72,15 @@ const Gallery: React.FC<GalleryProps> = ({ galleryId }) => {
     galleryData?.galleryUrls?.filter((url) => url && typeof url === "string") ||
     [];
 
+  // Pagination logic
+  const totalPages = Math.ceil(galleryImages.length / imagesPerPage);
+  const paginatedImages = galleryImages.slice(
+    (currentPage - 1) * imagesPerPage,
+    currentPage * imagesPerPage
+  );
+
   const openLightbox = (index: number) => {
-    setCurrentImageIndex(index);
+    setCurrentImageIndex(index + (currentPage - 1) * imagesPerPage);
     setLightboxOpen(true);
   };
 
@@ -94,7 +105,7 @@ const Gallery: React.FC<GalleryProps> = ({ galleryId }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 ">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#004643] mx-auto mb-4"></div>
           <h2 className="text-xl font-semibold text-gray-700">
@@ -131,7 +142,7 @@ const Gallery: React.FC<GalleryProps> = ({ galleryId }) => {
   return (
     <div className="space-y-6 bg-[#e6f2e6]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Destination Selector */}
+        {/* Other Destinations */}
         {otherDestinations.length > 0 && (
           <div data-aos="fade-up" className="mb-8">
             <h2 className="text-xl sm:text-2xl font-semibold text-center text-gray-800 mb-4">
@@ -152,7 +163,7 @@ const Gallery: React.FC<GalleryProps> = ({ galleryId }) => {
               </select>
 
               {selectedDestination && (
-                <div className="flex flex-col sm:flex-row items-center gap-4 bg-green-200  border-green-800 border-2 p-4 rounded-md">
+                <div className="flex flex-col sm:flex-row items-center gap-4 bg-green-200 border-green-800 border-2 p-4 rounded-md">
                   <Image
                     src={selectedDestination.coverImgUrl || "/placeholder.svg"}
                     alt={selectedDestination.title}
@@ -180,13 +191,12 @@ const Gallery: React.FC<GalleryProps> = ({ galleryId }) => {
           </div>
         )}
 
-        {/* Main Content */}
+        {/* Destination Content */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          <div 
-          data-aos="fade-right"
-        data-aos-offset="300"
-        data-aos-easing="ease-in-sine"
-            className="relative h-80 sm:h-96 rounded-xl overflow-hidden shadow-lg">
+          <div
+            data-aos="fade-right"
+            className="relative h-80 sm:h-96 rounded-xl overflow-hidden shadow-lg"
+          >
             <Image
               src={galleryData.coverImgUrl || "/placeholder.svg"}
               alt={galleryData.title}
@@ -197,77 +207,113 @@ const Gallery: React.FC<GalleryProps> = ({ galleryId }) => {
           </div>
 
           <div className="space-y-4">
-            <h1 
-            data-aos="zoom-in-left"
-            className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+            <h1
+              data-aos="zoom-in-left"
+              className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900"
+            >
               {galleryData.title}
             </h1>
             <p
-            data-aos="zoom-in-left"
-            data-aos-delay="200"
-            className="text-base sm:text-lg text-[#004643] font-medium">
+              data-aos="zoom-in-left"
+              data-aos-delay="200"
+              className="text-base sm:text-lg text-[#004643] font-medium"
+            >
               {galleryData.date}
             </p>
-            <p 
-            data-aos="zoom-in-left"
-            data-aos-delay="400"
-            className="text-base sm:text-lg text-[#004643] font-medium">
+            <p
+              data-aos="zoom-in-left"
+              data-aos-delay="400"
+              className="text-base sm:text-lg text-[#004643] font-medium"
+            >
               Province: {galleryData.province}
             </p>
             <p
-            data-aos="zoom-in-left"
-            data-aos-delay="600"
-            className="text-sm sm:text-base text-gray-700 leading-relaxed">
+              data-aos="zoom-in-left"
+              data-aos-delay="600"
+              className="text-sm sm:text-base text-gray-700 leading-relaxed"
+            >
               {galleryData.description}
             </p>
           </div>
         </div>
 
-        {/* Gallery Grid */}
+        {/* Image Gallery */}
         {galleryImages.length > 0 ? (
           <div className="mb-12">
             <div className="text-center mb-8">
               <h2
-              data-aos="zoom-out"
-               className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+                data-aos="zoom-out"
+                className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2"
+              >
                 Explore {galleryData.title}
               </h2>
               <p
-              data-aos="zoom-out"
-              data-aos-delay="200"
-              className="text-gray-600">
+                data-aos="zoom-out"
+                data-aos-delay="200"
+                className="text-gray-600"
+              >
                 Discover the beauty and wonder of this amazing destination
               </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {galleryImages.map((imageSrc, index) => (
-                <div
-                  key={index}
-                  data-aos="zoom-in"
-                  className="relative group cursor-pointer w-full overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-                  onClick={() => openLightbox(index)}
-                >
-                  <div className="relative w-full h-64 sm:h-72">
-                    <Image
-                      src={imageSrc}
-                      alt={`Gallery image ${index + 1}`}
-                      fill
-                      className="object-cover transition-transform duration-300 group-hover:scale-110"
-                      onError={(e) => {
-                        console.error("Image failed to load:", imageSrc);
-                        e.currentTarget.src = "/placeholder.svg";
-                      }}
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="bg-black bg-opacity-50 p-3 rounded-full">
-                        <ZoomIn size={28} className="text-white" />
+              {paginatedImages.map((imageSrc, index) => {
+                const actualIndex = (currentPage - 1) * imagesPerPage + index;
+                return (
+                  <div
+                    key={actualIndex}
+                    data-aos="zoom-in"
+                    className="relative group cursor-pointer w-full overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                    onClick={() => openLightbox(index)}
+                  >
+                    <div className="relative w-full h-64 sm:h-72">
+                      <Image
+                        src={imageSrc}
+                        alt={`Gallery image ${actualIndex + 1}`}
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="bg-black bg-opacity-50 p-3 rounded-full">
+                          <ZoomIn size={28} className="text-white" />
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-4 mt-6">
+                <button
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                    currentPage === 1
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : "bg-[#004643] text-white hover:bg-green-800"
+                  }`}
+                >
+                  Previous
+                </button>
+                <span className="text-gray-700 font-semibold">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                    currentPage === totalPages
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : "bg-[#004643] text-white hover:bg-green-800"
+                  }`}
+                >
+                  Next
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div className="mb-12 text-center">
