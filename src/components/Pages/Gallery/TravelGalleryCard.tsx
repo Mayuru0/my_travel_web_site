@@ -15,7 +15,7 @@ const TravelGalleryCard: React.FC<TravelGalleryCardProps> = ({ destination }) =>
 
         {/* Image Container */}
         <div
-          data-aos="zoom-in"
+          //data-aos="zoom-in"
           className="h-[200px] sm:h-[220px] md:h-[250px] lg:h-[280px] w-full"
         >
           <Image
