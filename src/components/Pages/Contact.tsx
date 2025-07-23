@@ -107,7 +107,7 @@ const Contact: FC = () => {
 
           <button
             type="submit"
-            className="w-full py-3 text-lg font-semibold text-white bg-green-500 rounded-lg hover:bg-green-600 transition-colors duration-300"
+            className="w-full py-3 text-lg font-semibold text-white bg-green-500 rounded-lg hover:bg-green-600 transition-colors duration-300 cursor-pointer"
           >
             Send Message
           </button>
