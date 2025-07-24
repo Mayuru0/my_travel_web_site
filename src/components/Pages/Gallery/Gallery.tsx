@@ -301,7 +301,7 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
               <select
                 value={selectedDestinationId}
                 onChange={(e) => setSelectedDestinationId(e.target.value)}
-                className="w-full md:w-80 p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004643] bg-white"
+                className="w-full md:w-80 p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004643] bg-white cursor-pointer"
               >
                 <option value="">-- Select a Location --</option>
                 {otherDestinations.map((dest) => (
@@ -456,7 +456,7 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
                       className={`w-full md:pl-11 pl-16 pr-4 py-3 sm:py-4 border-2 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004643] focus:border-transparent bg-white text-gray-700 font-medium transition-all duration-200 ${
                         isSearching
                           ? "border-gray-200 cursor-not-allowed opacity-50"
-                          : "border-gray-200 hover:border-[#004643]"
+                          : "border-gray-200 hover:border-[#004643] cursor-pointer"
                       }`}
                     >
                       <option value="">-- Select a Date --</option>
@@ -633,7 +633,7 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
                   className={`w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 shadow-md flex justify-center items-center gap-2 ${
                     currentPage === 1
                       ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                      : "bg-white text-[#004643] hover:bg-[#004643] hover:text-white border-2 border-[#004643]"
+                      : "bg-white text-[#004643] hover:bg-[#004643] hover:text-white border-2 border-[#004643] cursor-pointer"
                   }`}
                 >
                   <ChevronLeft className="w-5 h-5" />
@@ -649,8 +649,8 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
                         onClick={() => handleSetPage(page)}
                         className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 ${
                           currentPage === page
-                            ? "bg-[#004643] text-white shadow-lg"
-                            : "bg-white text-[#004643] hover:bg-gray-100 border border-gray-200"
+                            ? "bg-[#004643] text-white shadow-lg" 
+                            : "bg-white text-[#004643] hover:bg-gray-100 border border-gray-200 cursor-pointer"
                         }`}
                       >
                         {page}
@@ -666,7 +666,7 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
                   className={`w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 shadow-md flex justify-center items-center gap-2 ${
                     currentPage === totalPages
                       ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                      : "bg-white text-[#004643] hover:bg-[#004643] hover:text-white border-2 border-[#004643]"
+                      : "bg-white text-[#004643] hover:bg-[#004643] hover:text-white border-2 border-[#004643] cursor-pointer"
                   }`}
                 >
                   Next
@@ -699,7 +699,7 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
           <div className="relative max-w-6xl w-full mx-auto">
             <button
               onClick={closeLightbox}
-              className="absolute top-4 right-4 text-white hover:text-gray-300 z-10 bg-red-600 hover:bg-red-700 rounded-full p-3 transition-all duration-200 transform hover:scale-110 shadow-lg"
+              className="absolute top-0 -mt-15 right-4 text-white hover:text-gray-300 z-10 bg-red-600 hover:bg-red-700 rounded-full p-3 transition-all duration-200 transform hover:scale-110 shadow-lg cursor-pointer"
             >
               <X size={24} />
             </button>
