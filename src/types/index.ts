@@ -33,13 +33,14 @@ export interface Destination  {
 
 
 export interface GalleryData {
-  id: string;
+  id?: string;
   title: string;
   date: string;
   province: string;
   description: string;
   coverImgUrl: string;
   galleryUrls: string[];
+
 }
 
   
@@ -62,3 +63,23 @@ export interface GalleryData {
  vlogId?: string
  featured?: boolean;
 }
+
+
+import { Timestamp } from "firebase/firestore";
+export type CategoryType = {
+  id?: string;            
+  title: string;           
+  description: string;     
+  coverImgUrl: string;      
+ createdAt: Timestamp;
+  province: string;
+  galleryUrls: string[];
+  Destination: string
+  date: string
+  
+ 
+ 
+   
+  
+ 
+};

@@ -1,11 +1,11 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import TravelGalleryCarousel from "./TravelGalleryCarousel";
-import { getGalleries } from "@/lib/gallery"; // Your Firebase functions
-import { Destination } from "@/types/index";
+import { getCategories } from "@/lib/category";
+import { CategoryType } from "@/types/index";
 
 export default function TravelGalleryContainer() {
-  const [destinations, setDestinations] = useState<Destination[]>([]);
+  const [destinations, setDestinations] = useState<CategoryType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -13,8 +13,8 @@ export default function TravelGalleryContainer() {
     const fetchDestinations = async () => {
       try {
         setLoading(true);
-        const data = await getGalleries();
-        setDestinations(data as Destination[]);
+        const data = await getCategories();
+        setDestinations(data as CategoryType[] );
       } catch (err) {
         setError("Failed to fetch gallery data");
         console.error("Error fetching galleries:", err);

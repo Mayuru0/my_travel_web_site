@@ -11,7 +11,7 @@ const Page = () => {
   return (
     <div>
       <GalleryHero />
-      <Gallery galleryId={id} />
+      <Gallery categoryId={id} />
     </div>
   );
 };

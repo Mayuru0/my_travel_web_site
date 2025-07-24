@@ -3,26 +3,157 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { X, ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
-import type { Destination, GalleryData } from "@/types/index";
-import { getGalleryById, getGalleries } from "@/lib/gallery";
+import {X, ChevronLeft, ChevronRight, ZoomIn, Calendar, Search } from "lucide-react";
+import type { CategoryType, GalleryData } from "@/types/index";
+import { getCategoryById, getCategories } from "@/lib/category";
 
 import AOS from "aos";
 import "aos/dist/aos.css";
+import { getGalleries } from "@/lib/gallery";
 
-interface GalleryProps {
-  galleryId: string;
+
+
+// Skeleton Loading Component for Gallery Grid
+const GalleryGridSkeleton = () => {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {Array.from({ length: 8 }).map((_, index) => (
+        <div
+          key={index}
+          className="relative w-full overflow-hidden rounded-2xl shadow-lg bg-white border border-gray-100 animate-pulse"
+        >
+          <div className="relative w-full h-64 sm:h-72 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200">
+            {/* Shimmer effect overlay */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+
+            {/* Placeholder icon */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-12 h-12 bg-gray-300 rounded-full animate-pulse flex items-center justify-center">
+                <div className="w-6 h-6 bg-gray-400 rounded animate-pulse"></div>
+              </div>
+            </div>
+
+            {/* Loading text */}
+            <div className="absolute bottom-4 left-4 right-4">
+              <div className="h-3 bg-gray-300 rounded animate-pulse mb-2"></div>
+              <div className="h-2 bg-gray-200 rounded animate-pulse w-2/3"></div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
 }
 
-const Gallery: React.FC<GalleryProps> = ({ galleryId }) => {
-  const [selectedDestinationId, setSelectedDestinationId] =
-    useState<string>("");
-  const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [galleryData, setGalleryData] = useState<GalleryData | null>(null);
-  const [destinations, setDestinations] = useState<Destination[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string>("");
+
+// Individual Image Loading Component
+const GalleryImageWithLoading = ({
+  src,
+  alt,
+  index,
+  onClick,
+}: {
+  src: string
+  alt: string
+  index: number
+  onClick: () => void
+}) => {
+  const [imageLoaded, setImageLoaded] = useState(false)
+  const [imageError, setImageError] = useState(false)
+
+  return (
+    <div
+      data-aos="zoom-in"
+      data-aos-delay={index * 50} // Staggered animation
+      className="relative group cursor-pointer w-full overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 bg-white border border-gray-100"
+      onClick={onClick}
+    >
+      <div className="relative w-full h-64 sm:h-72">
+        {/* Loading skeleton */}
+        {!imageLoaded && !imageError && (
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 bg-[length:400%_400%] animate-pulse">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-8 h-8 border-4 border-[#004643] border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          </div>
+        )}
+
+        {/* Error state */}
+        {imageError && (
+          <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
+            <div className="text-center text-gray-500">
+              <div className="w-12 h-12 bg-gray-300 rounded-full mx-auto mb-2 flex items-center justify-center">
+                <X className="w-6 h-6" />
+              </div>
+              <p className="text-sm">Failed to load</p>
+            </div>
+          </div>
+        )}
+
+        {/* Actual image */}
+        <Image
+          src={src || "/placeholder.svg"}
+          alt={alt}
+          fill
+          className={`object-cover transition-all duration-500 group-hover:scale-110 ${
+            imageLoaded ? "opacity-100" : "opacity-0"
+          }`}
+          onLoad={() => setImageLoaded(true)}
+          onError={() => setImageError(true)}
+        />
+
+        {/* Hover overlay - only show when image is loaded */}
+        {imageLoaded && (
+          <>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="bg-white bg-opacity-90 p-4 rounded-full shadow-lg transform scale-75 group-hover:scale-100 transition-transform duration-300">
+                <ZoomIn size={28} className="text-[#004643]" />
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Loading progress indicator */}
+        {!imageLoaded && !imageError && (
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-200">
+            <div className="h-full bg-gradient-to-r from-[#004643] to-green-500 animate-pulse w-full transition-all duration-1000"></div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+interface GalleryProps {
+  categoryId: string;
+}
+
+const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
+    const [selectedDestinationId, setSelectedDestinationId] = useState<string>("")
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [galleryData, setGalleryData] = useState<CategoryType | null>(null)
+  const [galleryImage, setGalleryImage] = useState<GalleryData | null>(null)
+  const [destinations, setDestinations] = useState<CategoryType[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string>("")
+  const [availableDates, setAvailableDates] = useState<string[]>([])
+  const [selectedDate, setSelectedDate] = useState("")
+  const [isSearching, setIsSearching] = useState(false)
+  const [isGalleryLoading, setIsGalleryLoading] = useState(false)
+  const [searchResults, setSearchResults] = useState<{
+    found: boolean
+    message: string
+    imageCount: number
+  } | null>(null)
+
+
+
+
+
+
 
   // Pagination state
   const imagesPerPage = 8;
@@ -32,13 +163,16 @@ const Gallery: React.FC<GalleryProps> = ({ galleryId }) => {
     AOS.init({ duration: 800, once: true });
   }, []);
 
+
+ // Fetch gallery data
   useEffect(() => {
-    if (!galleryId) return;
+    if (!categoryId) return;
 
     const fetchGallery = async () => {
       setLoading(true);
       try {
-        const data = await getGalleryById(galleryId);
+        const data = await getCategoryById(categoryId);
+        console.log(categoryId)
         if (!data) {
           setError("Gallery not found");
           return;
@@ -53,12 +187,14 @@ const Gallery: React.FC<GalleryProps> = ({ galleryId }) => {
     };
 
     fetchGallery();
-  }, [galleryId]);
+  }, [categoryId]);
 
+
+// Fetch destinations
   useEffect(() => {
     const fetchDestinations = async () => {
       try {
-        const data = await getGalleries();
+        const data = await getCategories();
         setDestinations(data || []);
       } catch (err) {
         console.error("Failed to load destinations:", err);
@@ -68,8 +204,115 @@ const Gallery: React.FC<GalleryProps> = ({ galleryId }) => {
     fetchDestinations();
   }, []);
 
+
+  // Fetch gallery by title
+// Fetch gallery by title
+  useEffect(() => {
+    const fetchGalleryData = async () => {
+      setIsGalleryLoading(true)
+      try {
+        const allGalleries = await getGalleries()
+        const relatedGalleries = allGalleries.filter(
+          (gallery) => gallery.title.toLowerCase() === galleryData?.title?.toLowerCase(),
+        )
+        const uniqueDates = Array.from(new Set(relatedGalleries.map((g) => g.date)))
+        setAvailableDates(uniqueDates)
+
+        // Add delay for better loading effect
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+
+        if (relatedGalleries.length > 0) {
+          setGalleryImage(relatedGalleries[0])
+          console.log("Matched Gallery Loaded:", relatedGalleries[0])
+        } else {
+          console.log("No gallery found for title:", galleryData?.title)
+          setGalleryImage(null)
+        }
+      } catch (err) {
+        console.error("Error fetching gallery or dates:", err)
+      } finally {
+        setIsGalleryLoading(false)
+      }
+    }
+    if (galleryData?.title) {
+      fetchGalleryData()
+    }
+  }, [galleryData?.title])
+
+
+
+
+//serchby date
+
+// useEffect(() => {
+//   const fetchDates = async () => {
+//     try {
+//       const allGalleries = await getGalleries();
+//       const uniqueDates = Array.from(new Set(allGalleries.map(g => g.date)));
+//       setAvailableDates(uniqueDates);
+//     } catch (err) {
+//       console.error("Failed to load gallery dates:", err);
+//     }
+//   };
+
+//   fetchDates();
+// }, []);
+
+
+const handleSearchByDate = async () => {
+    if (!selectedDate) return
+
+    setIsSearching(true)
+    setIsGalleryLoading(true)
+    setSearchResults(null)
+
+    // Add a small delay for better UX
+    await new Promise((resolve) => setTimeout(resolve, 800))
+
+    try {
+      const allGalleries = await getGalleries()
+      const matchedGallery = allGalleries.find((gallery) => gallery.date.toLowerCase() === selectedDate.toLowerCase())
+
+      // Additional delay for gallery loading effect
+      await new Promise((resolve) => setTimeout(resolve, 1200))
+
+      if (matchedGallery) {
+        setGalleryImage(matchedGallery)
+        setCurrentPage(1) // Reset to first page when new gallery is loaded
+        setSearchResults({
+          found: true,
+          message: `Gallery found for ${selectedDate}`,
+          imageCount: matchedGallery.galleryUrls?.length || 0,
+        })
+        console.log("Matched Gallery Loaded by Date:", matchedGallery)
+      } else {
+        setGalleryImage(null)
+        setSearchResults({
+          found: false,
+          message: `No gallery found for ${selectedDate}`,
+          imageCount: 0,
+        })
+        console.log("No matching gallery found for date:", selectedDate)
+      }
+    } catch (err) {
+      setSearchResults({
+        found: false,
+        message: "Error occurred while searching",
+        imageCount: 0,
+      })
+      console.log("Error fetching gallery by date:", err)
+    } finally {
+      setIsSearching(false)
+      setIsGalleryLoading(false)
+    }
+  }
+
+
+
+
+
   const galleryImages =
-    galleryData?.galleryUrls?.filter((url) => url && typeof url === "string") ||
+    galleryImage?.galleryUrls?.filter((url) => url && typeof url === "string") ||
     [];
 
   // Pagination logic
@@ -213,13 +456,13 @@ const Gallery: React.FC<GalleryProps> = ({ galleryId }) => {
             >
               {galleryData.title}
             </h1>
-            <p
+            {/* <p
               data-aos="zoom-in-left"
               data-aos-delay="200"
               className="text-base sm:text-lg text-[#004643] font-medium"
             >
               {galleryData.date}
-            </p>
+            </p> */}
             <p
               data-aos="zoom-in-left"
               data-aos-delay="400"
@@ -237,140 +480,305 @@ const Gallery: React.FC<GalleryProps> = ({ galleryId }) => {
           </div>
         </div>
 
-        {/* Image Gallery */}
-        {galleryImages.length > 0 ? (
-          <div className="mb-12">
-            <div className="text-center mb-8">
-              <h2
-                data-aos="zoom-out"
-                className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2"
-              >
-                Explore {galleryData.title}
-              </h2>
-              <p
-                data-aos="zoom-out"
-                data-aos-delay="200"
-                className="text-gray-600"
-              >
-                Discover the beauty and wonder of this amazing destination
-              </p>
-            </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {paginatedImages.map((imageSrc, index) => {
-                const actualIndex = (currentPage - 1) * imagesPerPage + index;
-                return (
-                  <div
-                    key={actualIndex}
-                    data-aos="zoom-in"
-                    className="relative group cursor-pointer w-full overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-                    onClick={() => openLightbox(index)}
-                  >
-                    <div className="relative w-full h-64 sm:h-72">
-                      <Image
-                        src={imageSrc}
-                        alt={`Gallery image ${actualIndex + 1}`}
-                        fill
-                        className="object-cover transition-transform duration-300 group-hover:scale-110"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <div className="bg-black bg-opacity-50 p-3 rounded-full">
-                          <ZoomIn size={28} className="text-white" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
 
-            {/* Pagination Controls */}
-            {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-4 mt-6">
-                <button
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className={`px-4 py-2 rounded-md font-medium transition-colors ${
-                    currentPage === 1
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-[#004643] text-white hover:bg-green-800"
-                  }`}
-                >
-                  Previous
-                </button>
-                <span className="text-gray-700 font-semibold">
-                  Page {currentPage} of {totalPages}
-                </span>
-                <button
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
-                  className={`px-4 py-2 rounded-md font-medium transition-colors ${
-                    currentPage === totalPages
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-[#004643] text-white hover:bg-green-800"
-                  }`}
-                >
-                  Next
-                </button>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="mb-12 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Gallery</h2>
-            <p className="text-gray-600">
-              No gallery images available for this destination.
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* Lightbox */}
-      {lightboxOpen && galleryImages.length > 0 && (
-        <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4">
-          <div className="relative max-w-4xl w-full mx-auto">
-            <button
-              onClick={closeLightbox}
-              className="absolute top-0 -mt-3 right-4 text-white hover:text-gray-300 z-10 bg-red-600 cursor-pointer hover:bg-red-700 bg-opacity-50 rounded-full p-2"
-            >
-              <X size={24} />
-            </button>
-
-            {galleryImages.length > 1 && (
-              <>
-                <button
-                  onClick={prevImage}
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-10 bg-blue-600 hover:bg-blue-700 cursor-pointer bg-opacity-50 rounded-full p-2"
-                >
-                  <ChevronLeft size={24} />
-                </button>
-                <button
-                  onClick={nextImage}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-10 bg-blue-600 hover:bg-blue-700 cursor-pointer bg-opacity-50 rounded-full p-2"
-                >
-                  <ChevronRight size={24} />
-                </button>
-              </>
-            )}
-
-            <div className="relative w-full h-[70vh] sm:h-[80vh]">
-              <Image
-                src={galleryImages[currentImageIndex]}
-                alt={`Gallery image ${currentImageIndex + 1}`}
-                fill
-                className="object-contain"
-                sizes="(max-width: 640px) 100vw, 80vw"
-              />
-            </div>
-
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white bg-opacity-50 px-4 py-2 rounded-full">
-              {currentImageIndex + 1} / {galleryImages.length}
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default Gallery;
+   {/* Enhanced Search By Date Section with Loading Effects */}
+           <div data-aos="fade-up" className="mb-12">
+             <div className=" rounded-2xl shadow-xl p-8 border border-green-100 backdrop-blur-sm relative overflow-hidden">
+               {/* Loading Overlay */}
+               {isSearching && (
+                 <div className="absolute inset-0 bg-white bg-opacity-90 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
+                   <div className="text-center">
+                     <div className="relative">
+                       {/* Animated Search Icon */}
+                       <div className="w-16 h-16 mx-auto mb-4 relative">
+                         <div className="absolute inset-0 border-4 border-[#004643] border-t-transparent rounded-full animate-spin"></div>
+                         <div className="absolute inset-2 border-4 border-green-300 border-b-transparent rounded-full animate-spin animate-reverse"></div>
+                         <Search className="absolute inset-0 m-auto w-6 h-6 text-[#004643] animate-pulse" />
+                       </div>
+                       {/* Loading Text */}
+                       <div className="space-y-2">
+                         <h3 className="text-lg font-semibold text-[#004643] animate-pulse">Searching Gallery...</h3>
+                         <p className="text-sm text-gray-600">Looking for images from {selectedDate}</p>
+                         {/* Loading Progress Bar */}
+                         <div className="w-48 h-2 bg-gray-200 rounded-full mx-auto overflow-hidden">
+                           <div className="h-full bg-gradient-to-r from-[#004643] to-green-500 rounded-full animate-pulse w-full"></div>
+                         </div>
+                       </div>
+                     </div>
+                   </div>
+                 </div>
+               )}
+   
+               <div className="flex items-center justify-center mb-8">
+                 <Calendar className="w-7 h-7 text-[#004643] mr-3" />
+                 <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 bg-gradient-to-r from-[#004643] to-green-600 bg-clip-text ">
+                   Search Gallery by Date
+                 </h2>
+               </div>
+   
+               <div className="max-w-2xl mx-auto">
+                 <div className="flex flex-col md:flex-row gap-6 items-end">
+                   <div className="flex-1">
+                     <label htmlFor="date-select" className="block text-sm font-semibold text-gray-700 mb-3">
+                       Select Visit Date
+                     </label>
+                     <div className="relative">
+                       <select
+                         id="date-select"
+                         value={selectedDate}
+                         onChange={(e) => {
+                           setSelectedDate(e.target.value)
+                           setSearchResults(null) // Clear previous results
+                         }}
+                         disabled={isSearching}
+                         className={`w-full p-4 pl-12 border-2 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004643] focus:border-transparent bg-white transition-all duration-200 text-gray-700 font-medium ${
+                           isSearching
+                             ? "border-gray-200 cursor-not-allowed opacity-50"
+                             : "border-gray-200 hover:border-[#004643]"
+                         }`}
+                       >
+                         <option value="">-- Select a Date --</option>
+                         {availableDates.map((date, index) => (
+                           <option key={index} value={date} className="py-2">
+                             {date}
+                           </option>
+                         ))}
+                       </select>
+                       <Calendar
+                         className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 transition-colors duration-200 ${
+                           isSearching ? "text-gray-300" : "text-gray-400"
+                         }`}
+                       />
+                     </div>
+                   </div>
+   
+                   <button
+                     onClick={handleSearchByDate}
+                     disabled={!selectedDate || isSearching}
+                     className={`px-8 py-4 rounded-xl font-semibold transition-all duration-200 transform shadow-lg flex items-center gap-2 min-w-[160px] justify-center ${
+                       !selectedDate || isSearching
+                         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                         : "bg-gradient-to-r from-[#004643] to-green-700 text-white hover:from-green-800 hover:to-[#004643] shadow-xl hover:scale-105"
+                     }`}
+                   >
+                     {isSearching ? (
+                       <>
+                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                         <span className="animate-pulse">Searching...</span>
+                       </>
+                     ) : (
+                       <>
+                         <Search className="w-5 h-5" />
+                         Search Gallery
+                       </>
+                     )}
+                   </button>
+                 </div>
+   
+                 {/* Search Results Display */}
+                 {searchResults && !isSearching && (
+                   <div
+                     className={`mt-6 p-4 rounded-xl border-2 transition-all duration-500 transform translate-y-0 opacity-100 ${
+                       searchResults.found ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"
+                     }`}
+                   >
+                     <div className="flex items-center gap-3">
+                       {searchResults.found ? (
+                         <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center animate-bounce">
+                           <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                           </svg>
+                         </div>
+                       ) : (
+                         <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center animate-bounce">
+                           <X className="w-5 h-5 text-white" />
+                         </div>
+                       )}
+                       <div>
+                         <p className={`font-semibold ${searchResults.found ? "text-green-700" : "text-red-700"}`}>
+                           {searchResults.message}
+                         </p>
+                         {searchResults.found && searchResults.imageCount > 0 && (
+                           <p className="text-sm text-green-600 mt-1">
+                             Found {searchResults.imageCount} image{searchResults.imageCount !== 1 ? "s" : ""} in this
+                             gallery
+                           </p>
+                         )}
+                       </div>
+                     </div>
+                   </div>
+                 )}
+   
+                 {availableDates.length > 0 && (
+                   <div className="mt-6 p-4 bg-green-50 rounded-xl border border-green-200">
+                     <p className="text-sm text-green-700 font-medium">
+                       <span className="font-semibold">{availableDates.length}</span> date
+                       {availableDates.length !== 1 ? "s" : ""} available for this destination
+                     </p>
+                   </div>
+                 )}
+               </div>
+             </div>
+           </div>
+   
+           {/* Image Gallery with Enhanced Loading */}
+           {isGalleryLoading ? (
+             <div className="mb-12">
+               <div className="text-center mb-12">
+                 <div className="animate-pulse">
+                   <div className="h-12 bg-gray-200 rounded-lg w-96 mx-auto mb-4"></div>
+                   <div className="h-6 bg-gray-100 rounded w-64 mx-auto"></div>
+                 </div>
+               </div>
+               <GalleryGridSkeleton />
+             </div>
+           ) : galleryImages.length > 0 ? (
+             <div className="mb-12">
+               <div className="text-center mb-12">
+                 <h2
+                   data-aos="zoom-out"
+                   className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-[#004643] to-green-600 bg-clip-text "
+                 >
+                   Explore {galleryData.title}
+                 </h2>
+                 <p data-aos="zoom-out" data-aos-delay="200" className="text-lg text-gray-600 max-w-2xl mx-auto">
+                   Discover the beauty and wonder of this amazing destination through our curated gallery
+                 </p>
+                 {galleryImage?.date && (
+                   <div className="mt-4 inline-flex items-center px-4 py-2 bg-green-100 rounded-full border border-green-200">
+                     <Calendar className="w-4 h-4 text-green-600 mr-2" />
+                     <span className="text-green-700 font-medium">Visited on {galleryImage.date}</span>
+                   </div>
+                 )}
+               </div>
+   
+               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                 {paginatedImages.map((imageSrc, index) => {
+                   const actualIndex = (currentPage - 1) * imagesPerPage + index
+                   return (
+                     <GalleryImageWithLoading
+                       key={actualIndex}
+                       src={imageSrc}
+                       alt={`Gallery image ${actualIndex + 1}`}
+                       index={index}
+                       onClick={() => openLightbox(index)}
+                     />
+                   )
+                 })}
+               </div>
+   
+               {/* Enhanced Pagination Controls */}
+               {totalPages > 1 && (
+                 <div className="flex justify-center items-center gap-6 mt-12">
+                   <button
+                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                     disabled={currentPage === 1}
+                     className={`px-6 py-3 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center gap-2 ${
+                       currentPage === 1
+                         ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                         : "bg-white text-[#004643] hover:bg-[#004643] hover:text-white border-2 border-[#004643]"
+                     }`}
+                   >
+                     <ChevronLeft className="w-5 h-5" />
+                     Previous
+                   </button>
+   
+                   <div className="flex items-center gap-2">
+                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                       <button
+                         key={page}
+                         onClick={() => setCurrentPage(page)}
+                         className={`w-12 h-12 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 ${
+                           currentPage === page
+                             ? "bg-[#004643] text-white shadow-lg"
+                             : "bg-white text-[#004643] hover:bg-gray-100 border border-gray-200"
+                         }`}
+                       >
+                         {page}
+                       </button>
+                     ))}
+                   </div>
+   
+                   <button
+                     onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                     disabled={currentPage === totalPages}
+                     className={`px-6 py-3 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center gap-2 ${
+                       currentPage === totalPages
+                         ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                         : "bg-white text-[#004643] hover:bg-[#004643] hover:text-white border-2 border-[#004643]"
+                     }`}
+                   >
+                     Next
+                     <ChevronRight className="w-5 h-5" />
+                   </button>
+                 </div>
+               )}
+             </div>
+           ) : (
+             <div className="mb-12 text-center bg-white rounded-2xl p-12 shadow-lg border border-gray-100">
+               <div className="max-w-md mx-auto">
+                 <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                   <Calendar className="w-12 h-12 text-gray-400" />
+                 </div>
+                 <h2 className="text-3xl font-bold text-gray-900 mb-4">No Gallery Found</h2>
+                 <p className="text-gray-600 text-lg">
+                   No gallery images available for the selected date. Try selecting a different date or check back later.
+                 </p>
+               </div>
+             </div>
+           )}
+         </div>
+   
+         {/* Enhanced Lightbox */}
+         {lightboxOpen && galleryImages.length > 0 && (
+           <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
+             <div className="relative max-w-6xl w-full mx-auto">
+               <button
+                 onClick={closeLightbox}
+                 className="absolute top-4 right-4 text-white hover:text-gray-300 z-10 bg-red-600 hover:bg-red-700 rounded-full p-3 transition-all duration-200 transform hover:scale-110 shadow-lg"
+               >
+                 <X size={24} />
+               </button>
+   
+               {galleryImages.length > 1 && (
+                 <>
+                   <button
+                     onClick={prevImage}
+                     className="absolute left-4 top-1/2 transform-translate-y-1/2 text-white hover:text-gray-300 z-10 bg-blue-600 hover:bg-blue-700 rounded-full p-3 transition-all duration-200 transform hover:scale-110 shadow-lg"
+                   >
+                     <ChevronLeft size={24} />
+                   </button>
+                   <button
+                     onClick={nextImage}
+                     className="absolute right-4 top-1/2 transform-translate-y-1/2 text-white hover:text-gray-300 z-10 bg-blue-600 hover:bg-blue-700 rounded-full p-3 transition-all duration-200 transform hover:scale-110 shadow-lg"
+                   >
+                     <ChevronRight size={24} />
+                   </button>
+                 </>
+               )}
+   
+               <div className="relative w-full h-[70vh] sm:h-[80vh] rounded-2xl overflow-hidden">
+                 <Image
+                   src={galleryImages[currentImageIndex] || "/placeholder.svg"}
+                   alt={`Gallery image ${currentImageIndex + 1}`}
+                   fill
+                   className="object-contain"
+                   sizes="(max-width: 640px) 100vw, 80vw"
+                 />
+               </div>
+   
+               <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-6 py-3 rounded-full backdrop-blur-sm">
+                 <span className="font-medium">
+                   {currentImageIndex + 1} / {galleryImages.length}
+                 </span>
+               </div>
+             </div>
+           </div>
+         )}
+       </div>
+     )
+   }
+   
+   export default Gallery
+   

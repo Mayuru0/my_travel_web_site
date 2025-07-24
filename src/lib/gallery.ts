@@ -30,8 +30,7 @@ export const getGalleries = async (): Promise<Destination[]> => {
       date: data.date || "",
       description: data.description || "",
       coverImgUrl: data.coverImgUrl || "",
-      galleryUrls: Array.isArray(data.galleryUrls) ? data.galleryUrls : [],
-    };
+      galleryUrls: Array.isArray(data.galleryUrls) ? data.galleryUrls : [],    };
   });
 
   return galleries;
