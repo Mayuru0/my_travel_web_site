@@ -10,121 +10,10 @@ import { getCategoryById, getCategories } from "@/lib/category";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import { getGalleries } from "@/lib/gallery";
+import GalleryGridSkeleton from "./GalleryLoadingEffects/GalleryGridSkeleton";
+import GalleryImageWithLoading from "./GalleryLoadingEffects/GalleryImageWithLoading";
 
 
-
-// Skeleton Loading Component for Gallery Grid
-const GalleryGridSkeleton = () => {
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {Array.from({ length: 8 }).map((_, index) => (
-        <div
-          key={index}
-          className="relative w-full overflow-hidden rounded-2xl shadow-lg bg-white border border-gray-100 animate-pulse"
-        >
-          <div className="relative w-full h-64 sm:h-72 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200">
-            {/* Shimmer effect overlay */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
-
-            {/* Placeholder icon */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-12 h-12 bg-gray-300 rounded-full animate-pulse flex items-center justify-center">
-                <div className="w-6 h-6 bg-gray-400 rounded animate-pulse"></div>
-              </div>
-            </div>
-
-            {/* Loading text */}
-            <div className="absolute bottom-4 left-4 right-4">
-              <div className="h-3 bg-gray-300 rounded animate-pulse mb-2"></div>
-              <div className="h-2 bg-gray-200 rounded animate-pulse w-2/3"></div>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-
-// Individual Image Loading Component
-const GalleryImageWithLoading = ({
-  src,
-  alt,
-  index,
-  onClick,
-}: {
-  src: string
-  alt: string
-  index: number
-  onClick: () => void
-}) => {
-  const [imageLoaded, setImageLoaded] = useState(false)
-  const [imageError, setImageError] = useState(false)
-
-  return (
-    <div
-      data-aos="zoom-in"
-      data-aos-delay={index * 50} // Staggered animation
-      className="relative group cursor-pointer w-full overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 bg-white border border-gray-100"
-      onClick={onClick}
-    >
-      <div className="relative w-full h-64 sm:h-72">
-        {/* Loading skeleton */}
-        {!imageLoaded && !imageError && (
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 bg-[length:400%_400%] animate-pulse">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-8 h-8 border-4 border-[#004643] border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          </div>
-        )}
-
-        {/* Error state */}
-        {imageError && (
-          <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
-            <div className="text-center text-gray-500">
-              <div className="w-12 h-12 bg-gray-300 rounded-full mx-auto mb-2 flex items-center justify-center">
-                <X className="w-6 h-6" />
-              </div>
-              <p className="text-sm">Failed to load</p>
-            </div>
-          </div>
-        )}
-
-        {/* Actual image */}
-        <Image
-          src={src || "/placeholder.svg"}
-          alt={alt}
-          fill
-          className={`object-cover transition-all duration-500 group-hover:scale-110 ${
-            imageLoaded ? "opacity-100" : "opacity-0"
-          }`}
-          onLoad={() => setImageLoaded(true)}
-          onError={() => setImageError(true)}
-        />
-
-        {/* Hover overlay - only show when image is loaded */}
-        {imageLoaded && (
-          <>
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <div className="bg-white bg-opacity-90 p-4 rounded-full shadow-lg transform scale-75 group-hover:scale-100 transition-transform duration-300">
-                <ZoomIn size={28} className="text-[#004643]" />
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* Loading progress indicator */}
-        {!imageLoaded && !imageError && (
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-200">
-            <div className="h-full bg-gradient-to-r from-[#004643] to-green-500 animate-pulse w-full transition-all duration-1000"></div>
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
 
 interface GalleryProps {
   categoryId: string;
@@ -484,7 +373,7 @@ const handleSearchByDate = async () => {
 
    {/* Enhanced Search By Date Section with Loading Effects */}
            <div data-aos="fade-up" className="mb-12">
-             <div className=" rounded-2xl shadow-xl p-8 border border-green-100 backdrop-blur-sm relative overflow-hidden">
+             <div className="bg-white rounded-2xl shadow-xl p-8 border border-green-100 backdrop-blur-sm relative overflow-hidden">
                {/* Loading Overlay */}
                {isSearching && (
                  <div className="absolute inset-0 bg-white bg-opacity-90 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
@@ -502,7 +391,7 @@ const handleSearchByDate = async () => {
                          <p className="text-sm text-gray-600">Looking for images from {selectedDate}</p>
                          {/* Loading Progress Bar */}
                          <div className="w-48 h-2 bg-gray-200 rounded-full mx-auto overflow-hidden">
-                           <div className="h-full bg-gradient-to-r from-[#004643] to-green-500 rounded-full animate-pulse w-full"></div>
+                           <div className="h-full bg-gradient-to-r from-[#004643] to-green-500 rounded-full animate-pulse loading-bar"></div>
                          </div>
                        </div>
                      </div>
@@ -776,6 +665,89 @@ const handleSearchByDate = async () => {
              </div>
            </div>
          )}
+
+         {/* Custom Styles for Loading Animations */}
+      <style jsx>{`
+        @keyframes slideInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes loading-bar {
+          0% {
+            width: 0%;
+          }
+          50% {
+            width: 70%;
+          }
+          100% {
+            width: 100%;
+          }
+        }
+        
+        @keyframes gradient {
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
+        }
+        
+        @keyframes shimmer {
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
+        }
+        
+        @keyframes loading-progress {
+          0% {
+            width: 0%;
+          }
+          50% {
+            width: 60%;
+          }
+          100% {
+            width: 100%;
+          }
+        }
+        
+        .animate-slideInUp {
+          animation: slideInUp 0.5s ease-out;
+        }
+        
+        .loading-bar {
+          animation: loading-bar 2s ease-in-out infinite;
+        }
+        
+        .animate-reverse {
+          animation-direction: reverse;
+        }
+        
+        .animate-gradient {
+          animation: gradient 3s ease infinite;
+        }
+        
+        .animate-shimmer {
+          animation: shimmer 2s infinite;
+        }
+        
+        .animate-loading-progress {
+          animation: loading-progress 3s ease-in-out infinite;
+        }
+      `}</style>
        </div>
      )
    }
