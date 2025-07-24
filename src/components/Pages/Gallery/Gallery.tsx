@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {X, ChevronLeft, ChevronRight, ZoomIn, Calendar, Search } from "lucide-react";
+import {X, ChevronLeft, ChevronRight, Calendar, Search } from "lucide-react";
 import type { CategoryType, GalleryData } from "@/types/index";
 import { getCategoryById, getCategories } from "@/lib/category";
 
@@ -111,9 +111,11 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
         await new Promise((resolve) => setTimeout(resolve, 1000))
 
         if (relatedGalleries.length > 0) {
-          setGalleryImage(relatedGalleries[0])
-          console.log("Matched Gallery Loaded:", relatedGalleries[0])
-        } else {
+  setGalleryImage(relatedGalleries[0]);
+  setSelectedDate(relatedGalleries[0].date); // <-- Add this line to set default selected date
+  console.log("Matched Gallery Loaded:", relatedGalleries[0]);
+}
+ else {
           console.log("No gallery found for title:", galleryData?.title)
           setGalleryImage(null)
         }
@@ -195,9 +197,6 @@ const handleSearchByDate = async () => {
       setIsGalleryLoading(false)
     }
   }
-
-
-
 
 
   const galleryImages =
