@@ -453,7 +453,7 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
                         setSearchResults(null);
                       }}
                       disabled={isSearching}
-                      className={`w-full pl-11 pr-4 py-3 sm:py-4 border-2 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004643] focus:border-transparent bg-white text-gray-700 font-medium transition-all duration-200 ${
+                      className={`w-full md:pl-11 pl-16 pr-4 py-3 sm:py-4 border-2 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004643] focus:border-transparent bg-white text-gray-700 font-medium transition-all duration-200 ${
                         isSearching
                           ? "border-gray-200 cursor-not-allowed opacity-50"
                           : "border-gray-200 hover:border-[#004643]"
