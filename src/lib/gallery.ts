@@ -26,6 +26,7 @@ export const getGalleries = async (): Promise<Destination[]> => {
     return {
       id: doc.id,
       province: data.province || "",
+      subtitle: data.subtitle || "",
       title: data.title || "",
       date: data.date || "",
       description: data.description || "",

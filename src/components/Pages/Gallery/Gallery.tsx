@@ -40,15 +40,17 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
   const imageGridRef = React.useRef<HTMLDivElement | null>(null);
 
   // Pagination
- const scrollToImageGrid = () => {
-  // Only scroll for screens less than or equal to 1024px (mobile + tablet)
-  if (typeof window !== "undefined" && window.innerWidth <= 1024) {
-    if (imageGridRef.current) {
-      imageGridRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+  const scrollToImageGrid = () => {
+    // Only scroll for screens less than or equal to 1024px (mobile + tablet)
+    if (typeof window !== "undefined" && window.innerWidth <= 1024) {
+      if (imageGridRef.current) {
+        imageGridRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
     }
-  }
-};
-
+  };
 
   const handlePrevPage = () => {
     setCurrentPage((p) => Math.max(1, p - 1));
@@ -112,7 +114,6 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
     fetchDestinations();
   }, []);
 
-  // Fetch gallery by title
   // Fetch gallery by title
   useEffect(() => {
     const fetchGalleryData = async () => {
@@ -595,6 +596,13 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
                 Discover the beauty and wonder of this amazing destination
                 through our curated gallery
               </p>
+              <div className="mt-4">
+                {galleryImage?.subtitle && (
+                  <p className="text-lg font-bold text-gray-600">
+                   📌 {galleryImage.subtitle}
+                  </p>
+                )}
+              </div>
               {galleryImage?.date && (
                 <div className="mt-4 inline-flex items-center px-4 py-2 bg-green-100 rounded-full border border-green-200">
                   <Calendar className="w-4 h-4 text-green-600 mr-2" />
@@ -649,7 +657,7 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
                         onClick={() => handleSetPage(page)}
                         className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 ${
                           currentPage === page
-                            ? "bg-[#004643] text-white shadow-lg" 
+                            ? "bg-[#004643] text-white shadow-lg"
                             : "bg-white text-[#004643] hover:bg-gray-100 border border-gray-200 cursor-pointer"
                         }`}
                       >

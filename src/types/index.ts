@@ -29,6 +29,7 @@ export interface Destination  {
   description: string
   coverImgUrl: string
   galleryUrls: string[]
+  subtitle: string
 };
 
 
@@ -40,6 +41,7 @@ export interface GalleryData {
   description: string;
   coverImgUrl: string;
   galleryUrls: string[];
+  subtitle: string
 
 }
 
@@ -76,6 +78,7 @@ export type CategoryType = {
   galleryUrls: string[];
   Destination: string
   date: string
+  subtitle: string
   
  
  
