@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://madhuranga-travel-blog.vercel.app
+
+# Sitemaps
+Sitemap: https://madhuranga-travel-blog.vercel.app/sitemap.xml
