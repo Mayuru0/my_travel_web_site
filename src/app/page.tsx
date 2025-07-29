@@ -20,6 +20,7 @@ export default function Home() {
         <meta property="og:image" content="/thumbnail.jpg" />
         <meta property="og:url" content="https://madhuranga-travel-blog.vercel.app/" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="google-site-verification" content="BtZqLJosv8hqOAg4CbdBugkAzGjSo0bxSFIcoMCsDkA" />
       </Head>
        <section id="home">
       <Hero/>

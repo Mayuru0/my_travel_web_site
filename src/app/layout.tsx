@@ -59,6 +59,9 @@ export const metadata: Metadata = {
     creator: "@mayurumaduranga",
   },
   category: "Travel",
+  verification: {
+    google: "BtZqLJosv8hqOAg4CbdBugkAzGjSo0bxSFIcoMCsDkA",
+  },
 };
 
 export default function RootLayout({
@@ -74,6 +77,7 @@ export default function RootLayout({
         <Header />
         {children}
         <Footer />
+        
       </body>
     </html>
   );
