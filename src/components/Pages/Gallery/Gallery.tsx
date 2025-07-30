@@ -371,7 +371,10 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
                         Looking for images from {selectedDateOption?.date}
                       </p>
                       {selectedDateOption?.subtitle && (
-                        <p className="text-xs text-gray-500 italic break-words">"{selectedDateOption.subtitle}"</p>
+                        <p className="text-xs text-gray-500 italic break-words">
+  &#34;{selectedDateOption.subtitle}&#34;
+</p>
+
                       )}
                       <div className="w-40 sm:w-48 h-2 bg-gray-200 rounded-full mx-auto overflow-hidden">
                         <div className="h-full bg-gradient-to-r from-[#004643] to-green-500 rounded-full animate-pulse loading-bar"></div>
