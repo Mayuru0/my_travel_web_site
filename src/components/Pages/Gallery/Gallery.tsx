@@ -1,43 +1,50 @@
-"use client";
-
-import React, { useEffect, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { X, ChevronLeft, ChevronRight, Calendar, Search } from "lucide-react";
-import type { CategoryType, GalleryData } from "@/types/index";
-import { getCategoryById, getCategories } from "@/lib/category";
-
-import AOS from "aos";
-import "aos/dist/aos.css";
-import { getGalleries } from "@/lib/gallery";
-import GalleryGridSkeleton from "./GalleryLoadingEffects/GalleryGridSkeleton";
-import GalleryImageWithLoading from "./GalleryLoadingEffects/GalleryImageWithLoading";
+"use client"
+import React, { useEffect, useState } from "react"
+import Image from "next/image"
+import Link from "next/link"
+import { X, ChevronLeft, ChevronRight, Calendar, Search } from "lucide-react"
+import type { CategoryType, GalleryData } from "@/types/index"
+import { getCategoryById, getCategories } from "@/lib/category"
+import AOS from "aos"
+import "aos/dist/aos.css"
+import { getGalleries } from "@/lib/gallery"
+import GalleryGridSkeleton from "./GalleryLoadingEffects/GalleryGridSkeleton"
+import GalleryImageWithLoading from "./GalleryLoadingEffects/GalleryImageWithLoading"
 
 interface GalleryProps {
-  categoryId: string;
+  categoryId: string
+}
+
+// New interface for date options
+interface DateOption {
+  date: string
+  subtitle: string
+  id: string
 }
 
 const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
-  const [selectedDestinationId, setSelectedDestinationId] =
-    useState<string>("");
-  const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [galleryData, setGalleryData] = useState<CategoryType | null>(null);
-  const [galleryImage, setGalleryImage] = useState<GalleryData | null>(null);
-  const [destinations, setDestinations] = useState<CategoryType[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string>("");
-  const [availableDates, setAvailableDates] = useState<string[]>([]);
-  const [selectedDate, setSelectedDate] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
-  const [isGalleryLoading, setIsGalleryLoading] = useState(false);
-  const [searchResults, setSearchResults] = useState<{
-    found: boolean;
-    message: string;
-    imageCount: number;
-  } | null>(null);
+  const [selectedDestinationId, setSelectedDestinationId] = useState<string>("")
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [galleryData, setGalleryData] = useState<CategoryType | null>(null)
+  const [galleryImage, setGalleryImage] = useState<GalleryData | null>(null)
+  const [destinations, setDestinations] = useState<CategoryType[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string>("")
 
-  const imageGridRef = React.useRef<HTMLDivElement | null>(null);
+  // Updated to store date options with subtitle
+  const [availableDateOptions, setAvailableDateOptions] = useState<DateOption[]>([])
+  const [selectedDateOption, setSelectedDateOption] = useState<DateOption | null>(null)
+
+  const [isSearching, setIsSearching] = useState(false)
+  const [isGalleryLoading, setIsGalleryLoading] = useState(false)
+  const [searchResults, setSearchResults] = useState<{
+    found: boolean
+    message: string
+    imageCount: number
+  } | null>(null)
+
+  const imageGridRef = React.useRef<HTMLDivElement | null>(null)
 
   // Pagination
   const scrollToImageGrid = () => {
@@ -47,236 +54,209 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
         imageGridRef.current.scrollIntoView({
           behavior: "smooth",
           block: "start",
-        });
+        })
       }
     }
-  };
+  }
 
   const handlePrevPage = () => {
-    setCurrentPage((p) => Math.max(1, p - 1));
-    scrollToImageGrid();
-  };
+    setCurrentPage((p) => Math.max(1, p - 1))
+    scrollToImageGrid()
+  }
 
   const handleNextPage = () => {
-    setCurrentPage((p) => Math.min(totalPages, p + 1));
-    scrollToImageGrid();
-  };
+    setCurrentPage((p) => Math.min(totalPages, p + 1))
+    scrollToImageGrid()
+  }
 
   const handleSetPage = (page: number) => {
-    setCurrentPage(page);
-    scrollToImageGrid();
-  };
+    setCurrentPage(page)
+    scrollToImageGrid()
+  }
 
   // Pagination state
-  const imagesPerPage = 8;
-  const [currentPage, setCurrentPage] = useState(1);
+  const imagesPerPage = 8
+  const [currentPage, setCurrentPage] = useState(1)
 
   useEffect(() => {
-    AOS.init({ duration: 800, once: true });
-  }, []);
+    AOS.init({ duration: 800, once: true })
+  }, [])
 
   // Fetch gallery data
   useEffect(() => {
-    if (!categoryId) return;
-
+    if (!categoryId) return
     const fetchGallery = async () => {
-      setLoading(true);
+      setLoading(true)
       try {
-        const data = await getCategoryById(categoryId);
-        console.log(categoryId);
+        const data = await getCategoryById(categoryId)
+        console.log(categoryId)
         if (!data) {
-          setError("Gallery not found");
-          return;
+          setError("Gallery not found")
+          return
         }
-        setGalleryData(data);
+        setGalleryData(data)
       } catch (err) {
-        setError("Failed to load gallery data");
-        console.error(err);
+        setError("Failed to load gallery data")
+        console.error(err)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-
-    fetchGallery();
-  }, [categoryId]);
+    }
+    fetchGallery()
+  }, [categoryId])
 
   // Fetch destinations
   useEffect(() => {
     const fetchDestinations = async () => {
       try {
-        const data = await getCategories();
-        setDestinations(data || []);
+        const data = await getCategories()
+        setDestinations(data || [])
       } catch (err) {
-        console.error("Failed to load destinations:", err);
+        console.error("Failed to load destinations:", err)
       }
-    };
+    }
+    fetchDestinations()
+  }, [])
 
-    fetchDestinations();
-  }, []);
-
-  // Fetch gallery by title
+  // Fetch gallery by title and create date options
   useEffect(() => {
     const fetchGalleryData = async () => {
-      setIsGalleryLoading(true);
+      setIsGalleryLoading(true)
       try {
-        const allGalleries = await getGalleries();
+        const allGalleries = await getGalleries()
         const relatedGalleries = allGalleries.filter(
-          (gallery) =>
-            gallery.title.toLowerCase() === galleryData?.title?.toLowerCase()
-        );
-        const uniqueDates = Array.from(
-          new Set(relatedGalleries.map((g) => g.date))
-        );
-        setAvailableDates(uniqueDates);
+          (gallery) => gallery.title.toLowerCase() === galleryData?.title?.toLowerCase(),
+        )
+
+        // Create date options with both date and subtitle
+        const dateOptions: DateOption[] = relatedGalleries.map((gallery) => ({
+          date: gallery.date,
+          subtitle: gallery.subtitle || "No subtitle available",
+          id: gallery.id || `${gallery.date}-${gallery.subtitle}`,
+        }))
+
+        // Remove duplicates based on date
+        const uniqueDateOptions = dateOptions.filter(
+          (option, index, self) => index === self.findIndex((t) => t.date === option.date),
+        )
+
+        setAvailableDateOptions(uniqueDateOptions)
 
         // Add delay for better loading effect
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000))
 
         if (relatedGalleries.length > 0) {
-          setGalleryImage(relatedGalleries[0]);
-          setSelectedDate(relatedGalleries[0].date); // <-- Add this line to set default selected date
-          console.log("Matched Gallery Loaded:", relatedGalleries[0]);
+          setGalleryImage(relatedGalleries[0])
+          // Set default selected date option
+          const defaultOption = uniqueDateOptions.find((option) => option.date === relatedGalleries[0].date)
+          setSelectedDateOption(defaultOption || null)
+          console.log("Matched Gallery Loaded:", relatedGalleries[0])
         } else {
-          console.log("No gallery found for title:", galleryData?.title);
-          setGalleryImage(null);
+          console.log("No gallery found for title:", galleryData?.title)
+          setGalleryImage(null)
         }
       } catch (err) {
-        console.error("Error fetching gallery or dates:", err);
+        console.error("Error fetching gallery or dates:", err)
       } finally {
-        setIsGalleryLoading(false);
+        setIsGalleryLoading(false)
       }
-    };
-    if (galleryData?.title) {
-      fetchGalleryData();
     }
-  }, [galleryData?.title]);
 
-  //serchby date
+    if (galleryData?.title) {
+      fetchGalleryData()
+    }
+  }, [galleryData?.title])
 
-  // useEffect(() => {
-  //   const fetchDates = async () => {
-  //     try {
-  //       const allGalleries = await getGalleries();
-  //       const uniqueDates = Array.from(new Set(allGalleries.map(g => g.date)));
-  //       setAvailableDates(uniqueDates);
-  //     } catch (err) {
-  //       console.error("Failed to load gallery dates:", err);
-  //     }
-  //   };
-
-  //   fetchDates();
-  // }, []);
-
+  // Enhanced search by date function
   const handleSearchByDate = async () => {
-    if (!selectedDate) return;
+    if (!selectedDateOption) return
 
-    setIsSearching(true);
-    setIsGalleryLoading(true);
-    setSearchResults(null);
+    setIsSearching(true)
+    setIsGalleryLoading(true)
+    setSearchResults(null)
 
     // Add a small delay for better UX
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    await new Promise((resolve) => setTimeout(resolve, 800))
 
     try {
-      const allGalleries = await getGalleries();
+      const allGalleries = await getGalleries()
       const matchedGallery = allGalleries.find(
-        (gallery) => gallery.date.toLowerCase() === selectedDate.toLowerCase()
-      );
+        (gallery) => gallery.date.toLowerCase() === selectedDateOption.date.toLowerCase(),
+      )
 
       // Additional delay for gallery loading effect
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+      await new Promise((resolve) => setTimeout(resolve, 1200))
 
       if (matchedGallery) {
-        setGalleryImage(matchedGallery);
-        setCurrentPage(1); // Reset to first page when new gallery is loaded
+        setGalleryImage(matchedGallery)
+        setCurrentPage(1) // Reset to first page when new gallery is loaded
         setSearchResults({
           found: true,
-          message: `Gallery found for ${selectedDate}`,
+          message: `Gallery found for ${selectedDateOption.date}`,
           imageCount: matchedGallery.galleryUrls?.length || 0,
-        });
-        console.log("Matched Gallery Loaded by Date:", matchedGallery);
+        })
+        console.log("Matched Gallery Loaded by Date:", matchedGallery)
       } else {
-        setGalleryImage(null);
+        setGalleryImage(null)
         setSearchResults({
           found: false,
-          message: `No gallery found for ${selectedDate}`,
+          message: `No gallery found for ${selectedDateOption.date}`,
           imageCount: 0,
-        });
-        console.log("No matching gallery found for date:", selectedDate);
+        })
+        console.log("No matching gallery found for date:", selectedDateOption.date)
       }
     } catch (err) {
       setSearchResults({
         found: false,
         message: "Error occurred while searching",
         imageCount: 0,
-      });
-      console.log("Error fetching gallery by date:", err);
+      })
+      console.log("Error fetching gallery by date:", err)
     } finally {
-      setIsSearching(false);
-      setIsGalleryLoading(false);
+      setIsSearching(false)
+      setIsGalleryLoading(false)
     }
-  };
+  }
 
-  const galleryImages =
-    galleryImage?.galleryUrls?.filter(
-      (url) => url && typeof url === "string"
-    ) || [];
+  const galleryImages = galleryImage?.galleryUrls?.filter((url) => url && typeof url === "string") || []
 
   // Pagination logic
-  const totalPages = Math.ceil(galleryImages.length / imagesPerPage);
-  const paginatedImages = galleryImages.slice(
-    (currentPage - 1) * imagesPerPage,
-    currentPage * imagesPerPage
-  );
+  const totalPages = Math.ceil(galleryImages.length / imagesPerPage)
+  const paginatedImages = galleryImages.slice((currentPage - 1) * imagesPerPage, currentPage * imagesPerPage)
 
   const openLightbox = (index: number) => {
-    setCurrentImageIndex(index + (currentPage - 1) * imagesPerPage);
-    setLightboxOpen(true);
-  };
+    setCurrentImageIndex(index + (currentPage - 1) * imagesPerPage)
+    setLightboxOpen(true)
+  }
 
-  const closeLightbox = () => setLightboxOpen(false);
+  const closeLightbox = () => setLightboxOpen(false)
 
-  const nextImage = () =>
-    setCurrentImageIndex((prev) =>
-      prev === galleryImages.length - 1 ? 0 : prev + 1
-    );
+  const nextImage = () => setCurrentImageIndex((prev) => (prev === galleryImages.length - 1 ? 0 : prev + 1))
 
-  const prevImage = () =>
-    setCurrentImageIndex((prev) =>
-      prev === 0 ? galleryImages.length - 1 : prev - 1
-    );
+  const prevImage = () => setCurrentImageIndex((prev) => (prev === 0 ? galleryImages.length - 1 : prev - 1))
 
-  const otherDestinations = destinations.filter(
-    (d) => d.id !== galleryData?.id
-  );
-  const selectedDestination = otherDestinations.find(
-    (d) => d.id === selectedDestinationId
-  );
+  const otherDestinations = destinations.filter((d) => d.id !== galleryData?.id)
+
+  const selectedDestination = otherDestinations.find((d) => d.id === selectedDestinationId)
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#004643] mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-700">
-            Loading gallery...
-          </h2>
+          <h2 className="text-xl font-semibold text-gray-700">Loading gallery...</h2>
         </div>
       </div>
-    );
+    )
   }
 
   if (error || !galleryData) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-500 mb-4">
-            {error || "Destination not found"}
-          </h1>
+          <h1 className="text-2xl font-bold text-red-500 mb-4">{error || "Destination not found"}</h1>
           <p className="text-gray-600 mb-6">
-            {error
-              ? "Please try again later."
-              : "The destination you're looking for doesn't exist."}
+            {error ? "Please try again later." : "The destination you're looking for doesn't exist."}
           </p>
           <Link
             href="/"
@@ -286,7 +266,7 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
           </Link>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -311,7 +291,6 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
                   </option>
                 ))}
               </select>
-
               {selectedDestination && (
                 <div className="flex flex-col sm:flex-row items-center gap-4 bg-green-200 border-green-800 border-2 p-4 rounded-md">
                   <Image
@@ -343,10 +322,7 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
 
         {/* Destination Content */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          <div
-            data-aos="fade-right"
-            className="relative h-80 sm:h-96 rounded-xl overflow-hidden shadow-lg"
-          >
+          <div data-aos="fade-right" className="relative h-80 sm:h-96 rounded-xl overflow-hidden shadow-lg">
             <Image
               src={galleryData.coverImgUrl || "/placeholder.svg"}
               alt={galleryData.title}
@@ -355,26 +331,11 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
               priority
             />
           </div>
-
           <div className="space-y-4">
-            <h1
-              data-aos="zoom-in-left"
-              className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900"
-            >
+            <h1 data-aos="zoom-in-left" className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
               {galleryData.title}
             </h1>
-            {/* <p
-              data-aos="zoom-in-left"
-              data-aos-delay="200"
-              className="text-base sm:text-lg text-[#004643] font-medium"
-            >
-              {galleryData.date}
-            </p> */}
-            <p
-              data-aos="zoom-in-left"
-              data-aos-delay="400"
-              className="text-base sm:text-lg text-[#004643] font-medium"
-            >
+            <p data-aos="zoom-in-left" data-aos-delay="400" className="text-base sm:text-lg text-[#004643] font-medium">
               Province: {galleryData.province}
             </p>
             <p
@@ -387,7 +348,7 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
           </div>
         </div>
 
-        {/* Enhanced Search By Date Section with Loading Effects */}
+        {/* Enhanced Search By Date Section with Date and Subtitle */}
         <div data-aos="fade-up" className="mb-12 px-4 sm:px-6">
           <div className="rounded-2xl shadow-xl p-6 sm:p-8 border border-green-100 backdrop-blur-sm relative overflow-hidden">
             {/* Loading Overlay */}
@@ -401,14 +362,17 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
                       <div className="absolute inset-2 border-4 border-green-300 border-b-transparent rounded-full animate-spin animate-reverse"></div>
                       <Search className="absolute inset-0 m-auto w-5 h-5 text-[#004643] animate-pulse" />
                     </div>
-                    {/* Loading Text */}
+                    {/* Enhanced Loading Text with Subtitle */}
                     <div className="space-y-2 px-2">
                       <h3 className="text-base sm:text-lg font-semibold text-[#004643] animate-pulse">
                         Searching Gallery...
                       </h3>
                       <p className="text-sm text-gray-600 break-words">
-                        Looking for images from {selectedDate}
+                        Looking for images from {selectedDateOption?.date}
                       </p>
+                      {selectedDateOption?.subtitle && (
+                        <p className="text-xs text-gray-500 italic break-words">"{selectedDateOption.subtitle}"</p>
+                      )}
                       <div className="w-40 sm:w-48 h-2 bg-gray-200 rounded-full mx-auto overflow-hidden">
                         <div className="h-full bg-gradient-to-r from-[#004643] to-green-500 rounded-full animate-pulse loading-bar"></div>
                       </div>
@@ -418,7 +382,7 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
               </div>
             )}
 
-            <div className="flex items-center justify-center mb-6 sm:mb-8 text-center ">
+            <div className="flex items-center justify-center mb-6 sm:mb-8 text-center">
               <Calendar className="w-6 h-6 sm:w-7 sm:h-7 text-[#004643] mr-2 sm:mr-3" />
               <h2 className="text-xl sm:text-3xl font-bold text-gray-800 bg-gradient-to-r from-[#004643] to-green-600 bg-clip-text text-transparent">
                 Search Gallery by Date
@@ -427,13 +391,10 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
 
             <div className="max-w-2xl mx-auto w-full">
               <div className="flex flex-col md:flex-row gap-4 sm:gap-6 items-stretch sm:items-end">
-                {/* Date Select */}
+                {/* Enhanced Date Select with Subtitle */}
                 <div className="flex-1 w-full">
-                  <label
-                    htmlFor="date-select"
-                    className="block text-sm font-semibold text-gray-700 mb-2 sm:mb-3  "
-                  >
-                    Select Visit Date
+                  <label htmlFor="date-select" className="block text-sm font-semibold text-gray-700 mb-2 sm:mb-3">
+                    Select Visit Date & Experience
                   </label>
                   <div className="relative">
                     {/* Icon */}
@@ -444,14 +405,14 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
                         }`}
                       />
                     </div>
-
-                    {/* Select Input */}
+                    {/* Enhanced Select Input */}
                     <select
                       id="date-select"
-                      value={selectedDate}
+                      value={selectedDateOption?.id || ""}
                       onChange={(e) => {
-                        setSelectedDate(e.target.value);
-                        setSearchResults(null);
+                        const selectedOption = availableDateOptions.find((option) => option.id === e.target.value)
+                        setSelectedDateOption(selectedOption || null)
+                        setSearchResults(null)
                       }}
                       disabled={isSearching}
                       className={`w-full md:pl-11 pl-16 pr-4 py-3 sm:py-4 border-2 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004643] focus:border-transparent bg-white text-gray-700 font-medium transition-all duration-200 ${
@@ -460,22 +421,35 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
                           : "border-gray-200 hover:border-[#004643] cursor-pointer"
                       }`}
                     >
-                      <option value="">-- Select a Date --</option>
-                      {availableDates.map((date, index) => (
-                        <option key={index} value={date}>
-                          {date}
+                      <option value="">-- Select a Date & Experience --</option>
+                      {availableDateOptions.map((option) => (
+                        <option key={option.id} value={option.id}>
+                          {option.date} - {option.subtitle}
                         </option>
                       ))}
                     </select>
                   </div>
+
+                  {/* Selected Option Preview */}
+                  {selectedDateOption && !isSearching && (
+                    <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <Calendar className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                        <div className="text-sm">
+                          <p className="font-semibold text-blue-800">{selectedDateOption.date}</p>
+                          <p className="text-blue-600 text-xs mt-1">{selectedDateOption.subtitle}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Search Button */}
                 <button
                   onClick={handleSearchByDate}
-                  disabled={!selectedDate || isSearching}
+                  disabled={!selectedDateOption || isSearching}
                   className={`w-full md:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold transition-all duration-200 transform shadow-lg flex items-center justify-center gap-2 ${
-                    !selectedDate || isSearching
+                    !selectedDateOption || isSearching
                       ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                       : "bg-gradient-to-r from-[#004643] to-green-700 text-white hover:from-green-800 hover:to-[#004643] shadow-xl hover:scale-105 cursor-pointer"
                   }`}
@@ -483,16 +457,12 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
                   {isSearching ? (
                     <>
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                      <span className="animate-pulse text-sm sm:text-base">
-                        Searching...
-                      </span>
+                      <span className="animate-pulse text-sm sm:text-base">Searching...</span>
                     </>
                   ) : (
                     <>
                       <Search className="w-5 h-5" />
-                      <span className="text-sm sm:text-base">
-                        Search Gallery
-                      </span>
+                      <span className="text-sm sm:text-base">Search Gallery</span>
                     </>
                   )}
                 </button>
@@ -502,26 +472,14 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
               {searchResults && !isSearching && (
                 <div
                   className={`mt-6 p-4 rounded-xl border-2 transition-all duration-500 ${
-                    searchResults.found
-                      ? "bg-green-50 border-green-200"
-                      : "bg-red-50 border-red-200"
+                    searchResults.found ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"
                   }`}
                 >
                   <div className="flex items-start sm:items-center gap-3">
                     {searchResults.found ? (
                       <div className="w-7 h-7 bg-green-500 rounded-full flex items-center justify-center animate-bounce">
-                        <svg
-                          className="w-4 h-4 text-white"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
+                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
                       </div>
                     ) : (
@@ -530,20 +488,13 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
                       </div>
                     )}
                     <div className="text-sm">
-                      <p
-                        className={`font-semibold ${
-                          searchResults.found
-                            ? "text-green-700"
-                            : "text-red-700"
-                        }`}
-                      >
+                      <p className={`font-semibold ${searchResults.found ? "text-green-700" : "text-red-700"}`}>
                         {searchResults.message}
                       </p>
                       {searchResults.found && searchResults.imageCount > 0 && (
                         <p className="text-xs text-green-600 mt-1">
                           Found {searchResults.imageCount} image
-                          {searchResults.imageCount !== 1 ? "s" : ""} in this
-                          gallery
+                          {searchResults.imageCount !== 1 ? "s" : ""} in this gallery
                         </p>
                       )}
                     </div>
@@ -552,15 +503,11 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
               )}
 
               {/* Available Dates Info */}
-              {availableDates.length > 0 && (
+              {availableDateOptions.length > 0 && (
                 <div className="mt-6 p-4 bg-green-50 rounded-xl border border-green-200 text-sm sm:text-base">
                   <p className="text-green-700 font-medium">
-                    <span className="font-semibold">
-                      {availableDates.length}
-                    </span>{" "}
-                    date
-                    {availableDates.length !== 1 ? "s" : ""} available for this
-                    destination
+                    <span className="font-semibold">{availableDateOptions.length}</span> experience
+                    {availableDateOptions.length !== 1 ? "s" : ""} available for this destination
                   </p>
                 </div>
               )}
@@ -584,41 +531,29 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
             <div className="text-center mb-12">
               <h2
                 data-aos="zoom-out"
-                className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-[#004643] to-green-600 bg-clip-text "
+                className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-[#004643] to-green-600 bg-clip-text"
               >
                 Explore {galleryData.title}
               </h2>
-              <p
-                data-aos="zoom-out"
-                data-aos-delay="200"
-                className="text-lg text-gray-600 max-w-2xl mx-auto"
-              >
-                Discover the beauty and wonder of this amazing destination
-                through our curated gallery
+              <p data-aos="zoom-out" data-aos-delay="200" className="text-lg text-gray-600 max-w-2xl mx-auto">
+                Discover the beauty and wonder of this amazing destination through our curated gallery
               </p>
               <div className="mt-4">
                 {galleryImage?.subtitle && (
-                  <p className="text-lg font-bold text-gray-600">
-                   📌 {galleryImage.subtitle}
-                  </p>
+                  <p className="text-lg font-bold text-gray-600">📌 {galleryImage.subtitle}</p>
                 )}
               </div>
               {galleryImage?.date && (
                 <div className="mt-4 inline-flex items-center px-4 py-2 bg-green-100 rounded-full border border-green-200">
                   <Calendar className="w-4 h-4 text-green-600 mr-2" />
-                  <span className="text-green-700 font-medium">
-                    Visited on {galleryImage.date}
-                  </span>
+                  <span className="text-green-700 font-medium">Visited on {galleryImage.date}</span>
                 </div>
               )}
             </div>
 
-            <div
-              ref={imageGridRef}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-            >
+            <div ref={imageGridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {paginatedImages.map((imageSrc, index) => {
-                const actualIndex = (currentPage - 1) * imagesPerPage + index;
+                const actualIndex = (currentPage - 1) * imagesPerPage + index
                 return (
                   <GalleryImageWithLoading
                     key={actualIndex}
@@ -627,7 +562,7 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
                     index={index}
                     onClick={() => openLightbox(index)}
                   />
-                );
+                )
               })}
             </div>
 
@@ -650,21 +585,19 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
 
                 {/* Page Numbers */}
                 <div className="flex flex-wrap justify-center gap-2">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                    (page) => (
-                      <button
-                        key={page}
-                        onClick={() => handleSetPage(page)}
-                        className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 ${
-                          currentPage === page
-                            ? "bg-[#004643] text-white shadow-lg"
-                            : "bg-white text-[#004643] hover:bg-gray-100 border border-gray-200 cursor-pointer"
-                        }`}
-                      >
-                        {page}
-                      </button>
-                    )
-                  )}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => handleSetPage(page)}
+                      className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 ${
+                        currentPage === page
+                          ? "bg-[#004643] text-white shadow-lg"
+                          : "bg-white text-[#004643] hover:bg-gray-100 border border-gray-200 cursor-pointer"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
                 </div>
 
                 {/* Next Button */}
@@ -689,12 +622,9 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
               <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Calendar className="w-12 h-12 text-gray-400" />
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                No Gallery Found
-              </h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">No Gallery Found</h2>
               <p className="text-gray-600 text-lg">
-                No gallery images available for the selected date. Try selecting
-                a different date or check back later.
+                No gallery images available for the selected date. Try selecting a different date or check back later.
               </p>
             </div>
           </div>
@@ -711,7 +641,6 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
             >
               <X size={24} />
             </button>
-
             {galleryImages.length > 1 && (
               <>
                 <button
@@ -728,7 +657,6 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
                 </button>
               </>
             )}
-
             <div className="relative w-full h-[70vh] sm:h-[80vh] rounded-2xl overflow-hidden">
               <Image
                 src={galleryImages[currentImageIndex] || "/placeholder.svg"}
@@ -738,7 +666,6 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
                 sizes="(max-width: 640px) 100vw, 80vw"
               />
             </div>
-
             <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-6 py-3 rounded-full backdrop-blur-sm">
               <span className="font-medium">
                 {currentImageIndex + 1} / {galleryImages.length}
@@ -760,7 +687,6 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
             transform: translateY(0);
           }
         }
-
         @keyframes loading-bar {
           0% {
             width: 0%;
@@ -772,7 +698,6 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
             width: 100%;
           }
         }
-
         @keyframes gradient {
           0% {
             background-position: 0% 50%;
@@ -784,7 +709,6 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
             background-position: 0% 50%;
           }
         }
-
         @keyframes shimmer {
           0% {
             transform: translateX(-100%);
@@ -793,7 +717,6 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
             transform: translateX(100%);
           }
         }
-
         @keyframes loading-progress {
           0% {
             width: 0%;
@@ -805,33 +728,27 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
             width: 100%;
           }
         }
-
         .animate-slideInUp {
           animation: slideInUp 0.5s ease-out;
         }
-
         .loading-bar {
           animation: loading-bar 2s ease-in-out infinite;
         }
-
         .animate-reverse {
           animation-direction: reverse;
         }
-
         .animate-gradient {
           animation: gradient 3s ease infinite;
         }
-
         .animate-shimmer {
           animation: shimmer 2s infinite;
         }
-
         .animate-loading-progress {
           animation: loading-progress 3s ease-in-out infinite;
         }
       `}</style>
     </div>
-  );
-};
+  )
+}
 
-export default Gallery;
+export default Gallery
