@@ -128,27 +128,38 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
           (gallery) => gallery.title.toLowerCase() === galleryData?.title?.toLowerCase(),
         )
 
+        // // Create date options with both date and subtitle
+        // const dateOptions: DateOption[] = relatedGalleries.map((gallery) => ({
+        //   date: gallery.date,
+        //   subtitle: gallery.subtitle || "No subtitle available",
+        //   id: gallery.id || `${gallery.date}-${gallery.subtitle}`,
+        // }))
+
+        // // Remove duplicates based on date
+        // const uniqueDateOptions = dateOptions.filter(
+        //   (option, index, self) => index === self.findIndex((t) => t.date === option.date),
+        // )
+
+        // setAvailableDateOptions(uniqueDateOptions)
+
         // Create date options with both date and subtitle
-        const dateOptions: DateOption[] = relatedGalleries.map((gallery) => ({
-          date: gallery.date,
-          subtitle: gallery.subtitle || "No subtitle available",
-          id: gallery.id || `${gallery.date}-${gallery.subtitle}`,
-        }))
+const dateOptions: DateOption[] = relatedGalleries.map((gallery) => ({
+  date: gallery.date,
+  subtitle: gallery.subtitle || "No subtitle available",
+  id: gallery.id || `${gallery.date}-${gallery.subtitle}`,
+}))
 
-        // Remove duplicates based on date
-        const uniqueDateOptions = dateOptions.filter(
-          (option, index, self) => index === self.findIndex((t) => t.date === option.date),
-        )
-
-        setAvailableDateOptions(uniqueDateOptions)
+// Keep all options (no deduplication)
+setAvailableDateOptions(dateOptions)
 
         // Add delay for better loading effect
         await new Promise((resolve) => setTimeout(resolve, 1000))
 
         if (relatedGalleries.length > 0) {
           setGalleryImage(relatedGalleries[0])
+           setSelectedDateOption(dateOptions[0])
           // Set default selected date option
-          const defaultOption = uniqueDateOptions.find((option) => option.date === relatedGalleries[0].date)
+          const defaultOption = dateOptions.find((option) => option.date === relatedGalleries[0].date)
           setSelectedDateOption(defaultOption || null)
           console.log("Matched Gallery Loaded:", relatedGalleries[0])
         } else {
