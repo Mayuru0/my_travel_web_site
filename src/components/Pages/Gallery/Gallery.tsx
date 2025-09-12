@@ -193,52 +193,39 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
   setIsGalleryLoading(true)
   setSearchResults(null)
 
-  // Small delay for UX
+  // Add a small delay for better UX
   await new Promise((resolve) => setTimeout(resolve, 800))
 
   try {
     const allGalleries = await getGalleries()
-    
-    // Find all galleries with the same date
-    const matchedGalleries = allGalleries.filter(
-      (gallery) => gallery.date.toLowerCase() === selectedDateOption.date.toLowerCase()
+
+    // Now match both date and subtitle
+    const matchedGallery = allGalleries.find(
+      (gallery) =>
+        gallery.date.toLowerCase() === selectedDateOption.date.toLowerCase() &&
+        (gallery.subtitle || "No subtitle available") === selectedDateOption.subtitle
     )
 
-    // Combine all gallery images from matched galleries
-    const combinedImages = matchedGalleries.flatMap((gallery) =>
-      gallery.galleryUrls?.filter((url) => url && typeof url === "string") || []
-    )
+    // Additional delay for gallery loading effect
+    await new Promise((resolve) => setTimeout(resolve, 1200))
 
-    if (combinedImages.length > 0) {
-      // Create a new gallery object for displaying all images
-     const combinedGallery: GalleryData = {
-  id: selectedDateOption.id, // optional
-  title: galleryData?.title || "Gallery",
-  subtitle: selectedDateOption.subtitle || "No subtitle available",
-  date: selectedDateOption.date,
-  galleryUrls: combinedImages,
-  province: galleryData?.province || "Unknown",
-  description: galleryData?.description || "",
-  coverImgUrl: galleryData?.coverImgUrl || "/placeholder.svg",
-}
-
-
-      setGalleryImage(combinedGallery)
-      setCurrentPage(1) // Reset pagination
+    if (matchedGallery) {
+      setGalleryImage(matchedGallery)
+      setCurrentPage(1) // Reset to first page
       setSearchResults({
         found: true,
         message: `Gallery found for ${selectedDateOption.date}`,
-        imageCount: combinedImages.length,
+        imageCount: matchedGallery.galleryUrls?.length || 0,
       })
-      console.log("Matched Gallery Loaded:", combinedGallery)
+      console.log("Matched Gallery Loaded by Date & Subtitle:", matchedGallery)
     } else {
       setGalleryImage(null)
       setSearchResults({
         found: false,
-        message: `No gallery found for ${selectedDateOption.date}`,
+        message: `No gallery found for ${selectedDateOption.date} & "${selectedDateOption.subtitle}"`,
         imageCount: 0,
       })
-      console.log("No matching gallery found for date:", selectedDateOption.date)
+      console.log("No matching gallery found for date & subtitle:", selectedDateOption)
     }
   } catch (err) {
     setSearchResults({
@@ -246,12 +233,13 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
       message: "Error occurred while searching",
       imageCount: 0,
     })
-    console.error("Error fetching gallery by date:", err)
+    console.error("Error fetching gallery by date & subtitle:", err)
   } finally {
     setIsSearching(false)
     setIsGalleryLoading(false)
   }
 }
+
 
 
   const galleryImages =
