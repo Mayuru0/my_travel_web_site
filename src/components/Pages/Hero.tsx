@@ -14,14 +14,28 @@ const Hero = () => {
 
   return (
     <section className="relative w-full h-screen overflow-hidden">
-      {/* Background image */}
-      <Image
-        src="/hero/11.JPG"
-        alt="cover"
-        fill
-        priority
-        className="object-cover"
-      />
+      {/* Background image with slow pan animation */}
+      <motion.div
+        className="absolute inset-0"
+        animate={{
+          scale: [1, 1.1, 1],
+          x: [0, -30, 0],
+          y: [0, -15, 0],
+        }}
+        transition={{
+          duration: 20,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      >
+        <Image
+          src="/hero/11.JPG"
+          alt="cover"
+          fill
+          priority
+          className="object-cover"
+        />
+      </motion.div>
 
       {/* Overlay with blur and animation */}
       <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex flex-col items-center justify-center text-center px-4">

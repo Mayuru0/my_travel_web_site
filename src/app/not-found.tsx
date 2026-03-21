@@ -1,37 +1,95 @@
-import React from "react";
-import Link from "next/link";
-import { AlertTriangle } from "lucide-react";
+"use client";
 
+import Link from "next/link";
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { Compass, MapPin, ArrowLeft } from "lucide-react";
 
 const Custom404 = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 p-4">
-      <div className="mx-auto w-full max-w-md transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all duration-300 hover:scale-105">
-        <div className="p-8 text-center">
-          <div className="mb-6 flex justify-center">
-            <AlertTriangle
-              size={80}
-              className="animate-bounce text-red-500"
-              strokeWidth={1.5}
-            />
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Background image */}
+      <Image
+        src="/hero/abc.JPG"
+        alt="lost in travel"
+        fill
+        priority
+        className="object-cover"
+      />
+
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
+
+      {/* Content */}
+      <div className="relative z-10 flex min-h-screen flex-col items-center justify-center text-center px-4">
+
+        {/* Spinning compass */}
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+          className="mb-6 text-yellow-400"
+        >
+          <Compass size={72} strokeWidth={1.2} />
+        </motion.div>
+
+        {/* 404 number */}
+        <motion.h1
+          initial={{ opacity: 0, y: -40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-[10rem] font-extrabold leading-none text-white/10 select-none"
+          style={{ textShadow: "0 0 80px rgba(255,255,255,0.15)" }}
+        >
+          404
+        </motion.h1>
+
+        {/* Main message */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.8 }}
+          className="-mt-8 mb-4"
+        >
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <MapPin size={20} className="text-yellow-400" />
+            <span className="text-yellow-400 text-sm font-semibold uppercase tracking-widest">
+              Location Not Found
+            </span>
+            <MapPin size={20} className="text-yellow-400" />
           </div>
-          <h1 className="mb-4 bg-gradient-to-r from-red-500 to-pink-600 bg-clip-text text-8xl font-extrabold text-transparent">
-            404
-          </h1>
-          <h2 className="mb-4 text-3xl font-bold text-gray-800">
-            Page Not Found
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
+            You&apos;re Off the Map!
           </h2>
-          <p className="mb-6 text-gray-600">
-            Oops! The page you&apos;re looking for seems to have wandered off
-            into the digital wilderness.
+          <p className="text-gray-300 text-base sm:text-lg max-w-md mx-auto leading-relaxed">
+            Looks like this destination doesn&apos;t exist on our travel map.
+            Even the best explorers get lost sometimes — let&apos;s get you back on track.
           </p>
+        </motion.div>
+
+        {/* Button */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.6, duration: 0.6 }}
+        >
           <Link
             href="/"
-            className="inline-block rounded-full bg-gradient-to-r from-blue-500 to-purple-600 px-8 py-3 text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:shadow-xl"
+            className="inline-flex items-center gap-2 mt-6 px-8 py-3 rounded-full bg-yellow-400 text-black font-bold text-base sm:text-lg hover:bg-yellow-300 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-yellow-400/40"
           >
-            Return Home
+            <ArrowLeft size={20} />
+            Back to Home
           </Link>
-        </div>
+        </motion.div>
+
+        {/* Bottom tagline */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1, duration: 1 }}
+          className="mt-10 text-white/40 text-sm italic"
+        >
+          &quot;Not all those who wander are lost — but this page is.&quot;
+        </motion.p>
       </div>
     </div>
   );

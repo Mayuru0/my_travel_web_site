@@ -54,7 +54,7 @@ const TravelGalleryCarousel: React.FC<TravelGalleryCarouselProps> = ({
       <div className="mb-10" data-aos="fade-up">
         <div className="flex items-center gap-3 mb-3">
           <div className="w-8 h-0.5 bg-[#004643]" />
-          <span className="text-[#004643] text-xs font-semibold tracking-[0.2em] uppercase">
+          <span className="text-[#004643] text-xs font-semibold tracking-[0.2em] uppercase ">
             Explore
           </span>
         </div>
