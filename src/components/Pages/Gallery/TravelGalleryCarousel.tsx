@@ -14,7 +14,7 @@ interface TravelGalleryCarouselProps {
 const TravelGalleryCarousel: React.FC<TravelGalleryCarouselProps> = ({
   destinations,
   pauseOnHover = true,
-  speed = 0.6,
+  speed = 3,
 }) => {
   const [visibleItems, setVisibleItems] = useState(4);
   const [isHovered, setIsHovered] = useState(false);
@@ -78,6 +78,7 @@ const TravelGalleryCarousel: React.FC<TravelGalleryCarouselProps> = ({
         <div
           className="flex"
           style={{
+            width: `calc(100% / ${visibleItems} * ${doubled.length})`,
             animation: `marquee-scroll ${duration}s linear infinite`,
             animationPlayState: isHovered ? "paused" : "running",
           }}
@@ -85,7 +86,7 @@ const TravelGalleryCarousel: React.FC<TravelGalleryCarouselProps> = ({
           {doubled.map((destination, index) => (
             <div
               key={index}
-              style={{ flex: `0 0 calc(100% / ${visibleItems})` }}
+              style={{ flex: `0 0 calc(100% / ${doubled.length})` }}
             >
               <TravelGalleryCard destination={destination} />
             </div>
