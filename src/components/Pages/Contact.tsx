@@ -1,11 +1,23 @@
 "use client"
 
-import { useEffect, type FC } from "react"
+import { useEffect, useState, type FC } from "react"
 import { Phone, Mail, MapPin } from "lucide-react"
 import AOS from "aos"
 import "aos/dist/aos.css"
+import { saveContact } from "@/lib/contact"
 
 const Contact: FC = () => {
+  const [form, setForm] = useState({
+    firstname: "",
+    lastname: "",
+    email: "",
+    phone: "",
+    message: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
+
   useEffect(() => {
     AOS.init({
       duration: 1000,
@@ -13,6 +25,32 @@ const Contact: FC = () => {
       easing: "ease-in-out",
     });
   }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    setSuccess(false);
+
+    try {
+      await saveContact(form);
+      await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      setSuccess(true);
+      setForm({ firstname: "", lastname: "", email: "", phone: "", message: "" });
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <section
@@ -25,10 +63,10 @@ const Contact: FC = () => {
         {/* Contact Info Section */}
         <div className="space-y-8">
           <h2 className="text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent mb-6 animate-fade-in">
-            Let’s Connect
+            Let&apos;s Connect
           </h2>
           <p className="text-gray-800 text-lg mb-8">
-            I’d love to hear from you! Whether you have a question, a project idea, or just want to say hi — drop a message below or reach out directly.
+            I&apos;d love to hear from you! Whether you have a question, a project idea, or just want to say hi — drop a message below or reach out directly.
           </p>
 
           <div className="space-y-6">
@@ -60,15 +98,24 @@ const Contact: FC = () => {
 
         {/* Contact Form Section */}
         <form
+          onSubmit={handleSubmit}
+          className="bg-[#d0e4d0] rounded-2xl p-8 space-y-5 shadow-lg"
+        >
+          
+          {/* <form
           action="https://getform.io/f/bwnqlyja"
           method="POST"
           className="bg-[#d0e4d0] rounded-2xl p-8 space-y-5 shadow-lg"
-        >
+        ></form> */}
+
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <input
               type="text"
               name="firstname"
               placeholder="Firstname"
+              value={form.firstname}
+              onChange={handleChange}
               className="w-full px-4 py-3 bg-[#d0e4d0] text-black placeholder-gray-500 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
               required
             />
@@ -76,6 +123,8 @@ const Contact: FC = () => {
               type="text"
               name="lastname"
               placeholder="Lastname"
+              value={form.lastname}
+              onChange={handleChange}
               className="w-full px-4 py-3 bg-[#d0e4d0] text-black placeholder-gray-500 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
               required
             />
@@ -85,6 +134,8 @@ const Contact: FC = () => {
             type="email"
             name="email"
             placeholder="Email address"
+            value={form.email}
+            onChange={handleChange}
             className="w-full px-4 py-3 bg-[#d0e4d0] text-black placeholder-gray-500 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
             required
           />
@@ -93,23 +144,34 @@ const Contact: FC = () => {
             type="tel"
             name="phone"
             placeholder="Phone number"
+            value={form.phone}
+            onChange={handleChange}
             className="w-full px-4 py-3 bg-[#d0e4d0] text-black placeholder-gray-500 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
           />
 
-          
           <textarea
             name="message"
             placeholder="Type your message here."
             rows={5}
+            value={form.message}
+            onChange={handleChange}
             className="w-full px-4 py-3 bg-[#d0e4d0] text-black placeholder-gray-500 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
             required
           />
 
+          {success && (
+            <p className="text-green-700 font-medium text-sm">Message sent successfully!</p>
+          )}
+          {error && (
+            <p className="text-red-600 font-medium text-sm">{error}</p>
+          )}
+
           <button
             type="submit"
-            className="w-full py-3 text-lg font-semibold text-white bg-green-500 rounded-lg hover:bg-green-600 transition-colors duration-300 cursor-pointer"
+            disabled={loading}
+            className="w-full py-3 text-lg font-semibold text-white bg-green-500 rounded-lg hover:bg-green-600 transition-colors duration-300 cursor-pointer disabled:opacity-60"
           >
-            Send Message
+            {loading ? "Sending..." : "Send Message"}
           </button>
         </form>
       </div>
