@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import React, { useState, useMemo, useEffect } from "react";
-import { Play, Search, Filter } from "lucide-react";
+import { Play, Search, Filter, X } from "lucide-react";
 import { Vlog } from "@/types/index";
 import { getVlogs } from "@/lib/vlog";
 import AOS from "aos";
@@ -15,6 +15,7 @@ const Vlogs = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
+  const [selectedVideoUrl, setSelectedVideoUrl] = useState<string | null>(null);
   const videosPerPage = 6;
 
   useEffect(() => {
@@ -34,8 +35,14 @@ const Vlogs = () => {
 
 
 
+  const getYouTubeEmbedUrl = (url: string): string => {
+    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?/]+)/);
+    if (match) return `https://www.youtube.com/embed/${match[1]}?autoplay=1`;
+    return url;
+  };
+
   const handlePlayVideo = (url: string) => {
-    window.open(url, "_blank");
+    setSelectedVideoUrl(getYouTubeEmbedUrl(url));
   };
 
   // Filter and search logic
@@ -106,6 +113,7 @@ useEffect(() => {
 
 
   return (
+    <>
     <div className="bg-[#e6f2e6] ">
       {/* Hero Section */}
       <div className="relative text-4xl font-bold text-center bg-[#E8E8E8] min-h-80 "
@@ -347,6 +355,33 @@ useEffect(() => {
         )}
       </div>
     </div>
+
+      {/* Video Modal */}
+      {selectedVideoUrl && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"
+          onClick={() => setSelectedVideoUrl(null)}
+        >
+          <div
+            className="relative w-full max-w-4xl mx-4 aspect-video"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setSelectedVideoUrl(null)}
+              className="absolute -top-10 right-0 text-white hover:text-gray-300 transition-colors"
+            >
+              <X className="h-8 w-8" />
+            </button>
+            <iframe
+              src={selectedVideoUrl ?? undefined}
+              className="w-full h-full rounded-lg"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

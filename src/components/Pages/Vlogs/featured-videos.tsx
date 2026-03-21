@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Play } from "lucide-react";
+import { Play, X } from "lucide-react";
 import Link from "next/link";
 import { Vlog } from "@/types/index";
 import { getVlogs } from "@/lib/vlog";
@@ -11,6 +11,7 @@ import { motion } from "framer-motion";
 export default function FeaturedVideos() {
   const [vlogs, setVlogs] = useState<Vlog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedVideoUrl, setSelectedVideoUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchVlogs = async () => {
@@ -27,8 +28,14 @@ export default function FeaturedVideos() {
     fetchVlogs();
   }, []);
 
+  const getYouTubeEmbedUrl = (url: string): string => {
+    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?/]+)/);
+    if (match) return `https://www.youtube.com/embed/${match[1]}?autoplay=1`;
+    return url;
+  };
+
   const handlePlayVideo = (url: string) => {
-    window.open(url, "_blank");
+    setSelectedVideoUrl(getYouTubeEmbedUrl(url));
   };
 
 const lastThreeFeaturedVlogs = vlogs
@@ -37,6 +44,7 @@ const lastThreeFeaturedVlogs = vlogs
 
 
   return (
+    <>
     <div className="w-full py-8 px-4">
       <div className="max-w-6xl mx-auto">
         <motion.h2
@@ -113,5 +121,32 @@ const lastThreeFeaturedVlogs = vlogs
         </motion.div>
       </div>
     </div>
+
+      {/* Video Modal */}
+      {selectedVideoUrl && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"
+          onClick={() => setSelectedVideoUrl(null)}
+        >
+          <div
+            className="relative w-full max-w-4xl mx-4 aspect-video"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setSelectedVideoUrl(null)}
+              className="absolute -top-10 right-0 text-white hover:text-gray-300 transition-colors"
+            >
+              <X className="h-8 w-8" />
+            </button>
+            <iframe
+              src={selectedVideoUrl ?? undefined}
+              className="w-full h-full rounded-lg"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        </div>
+      )}
+    </>
   );
 }
