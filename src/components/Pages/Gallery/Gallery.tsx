@@ -40,6 +40,10 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
   const [selectedDateOption, setSelectedDateOption] =
     useState<DateOption | null>(null);
 
+  const [locationSearch, setLocationSearch] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const locationSearchRef = React.useRef<HTMLDivElement | null>(null);
+
   const [isSearching, setIsSearching] = useState(false);
   const [isGalleryLoading, setIsGalleryLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<{
@@ -320,15 +324,63 @@ const Gallery: React.FC<GalleryProps> = ({ categoryId }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Other Destinations */}
         {otherDestinations.length > 0 && (
-          <div data-aos="fade-up" className="mb-8">
+          <div data-aos="fade-up" className="mb-8 relative z-10">
             <h2 className="text-xl sm:text-2xl font-semibold text-center text-gray-800 mb-4">
               Search My Other Travel Location
             </h2>
-            <div className="flex flex-col md:flex-row items-center justify-center gap-6">
+            <div className="flex flex-col md:flex-row items-center justify-center gap-4">
+              <div ref={locationSearchRef} className="relative w-full md:w-72">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={locationSearch}
+                    onChange={(e) => {
+                      setLocationSearch(e.target.value);
+                      setShowSuggestions(true);
+                      if (!e.target.value) setSelectedDestinationId("");
+                    }}
+                    onFocus={() => setShowSuggestions(true)}
+                    onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+                    placeholder="Search a location..."
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004643] bg-white"
+                  />
+                </div>
+                {showSuggestions && locationSearch.trim() !== "" && (
+                  <ul className="absolute z-50 w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-1 max-h-56 overflow-y-auto">
+                    {otherDestinations
+                      .filter((dest) =>
+                        dest.title.toLowerCase().includes(locationSearch.toLowerCase())
+                      )
+                      .map((dest) => (
+                        <li
+                          key={dest.id}
+                          onMouseDown={() => {
+                            setSelectedDestinationId(dest.id ?? "");
+                            setLocationSearch(dest.title);
+                            setShowSuggestions(false);
+                          }}
+                          className="px-4 py-2 hover:bg-green-50 cursor-pointer text-gray-700 text-sm"
+                        >
+                          {dest.title}
+                        </li>
+                      ))}
+                    {otherDestinations.filter((dest) =>
+                      dest.title.toLowerCase().includes(locationSearch.toLowerCase())
+                    ).length === 0 && (
+                      <li className="px-4 py-2 text-gray-400 text-sm">No locations found</li>
+                    )}
+                  </ul>
+                )}
+              </div>
               <select
                 value={selectedDestinationId}
-                onChange={(e) => setSelectedDestinationId(e.target.value)}
-                className="w-full md:w-80 p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004643] bg-white cursor-pointer"
+                onChange={(e) => {
+                  setSelectedDestinationId(e.target.value);
+                  const dest = otherDestinations.find((d) => d.id === e.target.value);
+                  setLocationSearch(dest?.title ?? "");
+                }}
+                className="w-full md:w-72 p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004643] bg-white cursor-pointer"
               >
                 <option value="">-- Select a Location --</option>
                 {otherDestinations.map((dest) => (
