@@ -42,7 +42,7 @@ const TravelGalleryCarousel: React.FC<TravelGalleryCarouselProps> = ({
   const duration = destinations.length * speed;
 
   return (
-    <div className="container mx-auto px-4 py-12 sm:py-16">
+    <div className="container mx-auto px-4 py-12 sm:py-16 max-w-6xl">
       <style>{`
         @keyframes marquee-scroll {
           from { transform: translateX(0); }
